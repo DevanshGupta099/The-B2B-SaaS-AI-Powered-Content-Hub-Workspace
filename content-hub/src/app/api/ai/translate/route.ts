@@ -45,8 +45,9 @@ Return strictly valid JSON:
     }
 
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Translate API Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to transcreate content" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Failed to transcreate content";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -1,24 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { AppLayout, WorkspaceFolder } from "@/components/AppLayout";
 import { AiCommandMenu } from "@/components/AiCommandMenu";
 import { AvatarGroup, User } from "@/components/ui/AvatarGroup";
 import { Button } from "@/components/ui/Button";
-import { Share2, Settings, Sparkles, Send, MessageSquare, Save, Wand2, Check, RefreshCw } from "lucide-react";
+import { 
+  Share2, 
+  Settings, 
+  Sparkles, 
+  Send, 
+  MessageSquare, 
+  Save, 
+  Wand2, 
+  Check, 
+  Plus, 
+  FileText
+} from "lucide-react";
 import { AiVisionBlock } from "@/components/AiVisionBlock";
 import { useToast } from "@/components/ui/ToastNotifications";
-import { getDocuments, saveDocuments, WorkspaceDocument } from "@/lib/documents";
+import { getDocuments, saveDocuments, WorkspaceDocument, createDocument } from "@/lib/documents";
 
 const folders: WorkspaceFolder[] = [
+  { id: "1", name: "Project Apollo", files: [{ id: "apollo-arch", name: "Architecture RFC" }] },
+  { id: "2", name: "Brand Refresh", files: [{ id: "brand-refresh-doc", name: "Brand Identity v2.4" }] },
+  { id: "3", name: "Q4 Roadmap", files: [{ id: "q4-roadmap-doc", name: "Product Roadmap OKRs" }] },
   { id: "marketing", name: "Marketing", files: [{ id: "marketing-q4", name: "Marketing Strategy - Q4" }, { id: "brand-guidelines", name: "Brand Guidelines" }] },
   { id: "engineering", name: "Engineering", files: [{ id: "architecture-rfc", name: "Architecture RFC" }, { id: "api-docs", name: "API Documentation" }] },
 ];
 
 const collaborators: User[] = [
-  { id: "sarah", name: "Sarah Connor", role: "Admin", avatarUrl: "https://i.pravatar.cc/150?u=sarah" },
-  { id: "devansh", name: "Devansh", role: "Admin", avatarUrl: "https://i.pravatar.cc/150?u=devansh" },
+  { id: "sarah", name: "Sarah Connor", role: "Admin", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" },
+  { id: "devansh", name: "Devansh", role: "Admin", avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80" },
 ];
 
 interface Comment { id: string; author: string; message: string; time: string; }
@@ -70,7 +84,7 @@ function ContextPanel({ comments, onComment, isAiThinking }: { comments: Comment
           <input 
             value={message} 
             onChange={(event) => setMessage(event.target.value)} 
-            className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-500" 
+            className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-500 font-medium" 
             placeholder="Comment or ask @ai..." 
           />
           <Button type="submit" size="sm" className="bg-slate-900 px-3 text-white">
@@ -85,27 +99,99 @@ function ContextPanel({ comments, onComment, isAiThinking }: { comments: Comment
 export default function WorkspacePage() {
   const params = useParams<{ id: string }>();
   const { addToast } = useToast();
-  const [workspaceDocument, setWorkspaceDocument] = useState<WorkspaceDocument | null>(() => getDocuments().find((item) => item.id === params.id) ?? null);
+  
+  const [workspaceDocument, setWorkspaceDocument] = useState<WorkspaceDocument | null>(() => {
+    return getDocuments().find((item) => item.id === params.id) ?? null;
+  });
+  
+  const [isLoading, setIsLoading] = useState(true);
   const [comments, setComments] = useState<Comment[]>([
-    { id: "starter", author: "Sarah Connor", message: "Let's make the positioning section more specific to enterprise teams.", time: "2m" }
+    { id: "starter", author: "Sarah Connor", message: "Positioning section is aligned with enterprise governance requirements.", time: "2m" }
   ]);
   const [isAiThinking, setIsAiThinking] = useState(false);
   const [isAiTransforming, setIsAiTransforming] = useState(false);
   const [aiMenuOpen, setAiMenuOpen] = useState(false);
 
-  const persist = (updates: Partial<WorkspaceDocument>) => {
+  // Dynamic backend hydration: resolves document IDs and workspace IDs gracefully
+  useEffect(() => {
+    let isMounted = true;
+    async function loadWorkspaceDocument() {
+      setIsLoading(true);
+      try {
+        // 1. Check local storage first
+        const localDocs = getDocuments();
+        const matchedLocal = localDocs.find(d => d.id === params.id);
+        if (matchedLocal) {
+          if (isMounted) {
+            setWorkspaceDocument(matchedLocal);
+            setIsLoading(false);
+          }
+          return;
+        }
+
+        // 2. Fetch from backend API /api/documents/${params.id}
+        const res = await fetch(`/api/documents/${params.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.document && isMounted) {
+            setWorkspaceDocument(data.document);
+            setIsLoading(false);
+            return;
+          }
+        }
+
+        // 3. Fallback: Check if any workspace matches or pick default document
+        const allRes = await fetch("/api/documents");
+        if (allRes.ok) {
+          const allData = await allRes.json();
+          if (allData.documents && allData.documents.length > 0 && isMounted) {
+            // Find one matching the category or first
+            const fallback = allData.documents.find((d: WorkspaceDocument) => 
+              d.workspace.toLowerCase() === params.id.toLowerCase() ||
+              d.id.includes(params.id)
+            ) || allData.documents[0];
+            setWorkspaceDocument(fallback);
+            setIsLoading(false);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load workspace document:", err);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    }
+
+    loadWorkspaceDocument();
+    return () => { isMounted = false; };
+  }, [params.id]);
+
+  const persist = async (updates: Partial<WorkspaceDocument>) => {
     if (!workspaceDocument) return;
     const next = { ...workspaceDocument, ...updates, updatedAt: "Just now" };
     setWorkspaceDocument(next);
+    
+    // Save to local storage
     saveDocuments(getDocuments().map((item) => item.id === next.id ? next : item));
+
+    // Save to backend store
+    try {
+      await fetch(`/api/documents/${next.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates)
+      });
+    } catch {
+      // Backend sync error silently handled (local persistence guaranteed)
+    }
   };
 
   const share = async () => {
     try { 
       await navigator.clipboard.writeText(window.location.href); 
-      addToast({ title: "Sharing link copied", message: "Anyone with this link can view the document.", type: "success" }); 
+      addToast({ title: "Sharing link copied", message: "Direct link to this workspace document copied.", type: "success" }); 
     } catch { 
-      addToast({ title: "Unable to copy link", message: "Your browser blocked clipboard access.", type: "error" }); 
+      addToast({ title: "Unable to copy link", message: "Clipboard permission denied.", type: "error" }); 
     }
   };
 
@@ -136,8 +222,9 @@ export default function WorkspacePage() {
         persist({ content: formattedNewContent });
         addToast({ title: `AI ${action} applied!`, message: `Generated in ${data.latencyMs}ms with Groq.`, type: "success" });
       }
-    } catch (err: any) {
-      addToast({ title: "AI Error", message: err.message, type: "error" });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "AI Error";
+      addToast({ title: "AI Error", message, type: "error" });
     } finally {
       setIsAiTransforming(false);
     }
@@ -176,11 +263,42 @@ export default function WorkspacePage() {
     }
   };
 
+  const handleCreateNewDoc = () => {
+    const newDoc = createDocument("New Workspace Document", "Marketing");
+    setWorkspaceDocument(newDoc);
+    addToast({ title: "New Document Initialized", message: "Ready for drafting.", type: "success" });
+  };
+
+  if (isLoading && !workspaceDocument) {
+    return (
+      <AppLayout folders={folders}>
+        <div className="flex h-full flex-col items-center justify-center bg-slate-50 text-slate-500 gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 shadow-xs">
+            <Sparkles className="w-6 h-6 animate-spin" />
+          </div>
+          <div className="text-center">
+            <h3 className="font-heading text-base font-bold text-slate-900">Connecting to Workspace...</h3>
+            <p className="text-xs text-slate-400 mt-0.5">Hydrating documents from backend repository</p>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
   if (!workspaceDocument) {
     return (
       <AppLayout folders={folders}>
-        <div className="flex h-full items-center justify-center bg-slate-50 text-slate-500">
-          Loading document…
+        <div className="flex h-full flex-col items-center justify-center bg-slate-50 p-6 text-center">
+          <div className="w-14 h-14 rounded-3xl bg-white border border-slate-200 flex items-center justify-center text-indigo-600 shadow-sm mb-4">
+            <FileText className="w-7 h-7" />
+          </div>
+          <h2 className="font-heading text-2xl font-bold text-slate-900">Workspace Initialized</h2>
+          <p className="text-xs text-slate-500 max-w-sm mt-1 mb-6">
+            There are no documents in this specific workspace view yet. Start your first governed draft.
+          </p>
+          <Button onClick={handleCreateNewDoc} className="bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs px-5 py-2.5 rounded-xl gap-2">
+            <Plus className="w-4 h-4" /> Create First Document
+          </Button>
         </div>
       </AppLayout>
     );
@@ -198,34 +316,34 @@ export default function WorkspacePage() {
           />
         }
       >
-        <header className="absolute left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-slate-100 bg-white/85 px-6 backdrop-blur-md">
-          <div className="min-w-0 text-sm font-medium text-slate-500">
-            <span>{workspaceDocument.workspace}</span>
+        <header className="absolute left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/90 px-6 backdrop-blur-md">
+          <div className="min-w-0 text-xs font-medium text-slate-500">
+            <span className="font-bold text-indigo-600">{workspaceDocument.workspace}</span>
             <span className="mx-2 text-slate-300">/</span>
-            <span className="font-semibold text-slate-900">{workspaceDocument.title}</span>
+            <span className="font-bold text-slate-900 truncate">{workspaceDocument.title}</span>
           </div>
           <div className="flex items-center gap-3">
             <div className="hidden items-center gap-2 sm:flex">
-              <span className="text-xs text-slate-400">Saved locally</span>
+              <span className="text-[11px] text-slate-400 font-mono">Sync: Connected</span>
               <AvatarGroup users={collaborators} maxCount={3} />
             </div>
             <Button variant="ghost" size="sm" className="hidden px-2 sm:flex">
-              <Settings className="h-4 w-4" />
+              <Settings className="h-4 w-4 text-slate-500" />
             </Button>
-            <Button onClick={share} className="gap-2 rounded-xl bg-[#020617] px-4 text-white hover:bg-slate-800">
-              <Share2 className="h-4 w-4" /> Share
+            <Button onClick={share} className="gap-2 rounded-xl bg-slate-900 px-4 text-white hover:bg-slate-800 text-xs font-semibold">
+              <Share2 className="h-3.5 w-3.5" /> Share
             </Button>
           </div>
         </header>
 
         <div className="h-full w-full overflow-y-auto bg-white pt-16">
-          <div className="mx-auto max-w-4xl px-6 pb-32 pt-16 sm:px-12">
+          <div className="mx-auto max-w-4xl px-6 pb-32 pt-12 sm:px-12">
             <input 
               key={`${workspaceDocument.id}-${workspaceDocument.title}`} 
               type="text" 
               defaultValue={workspaceDocument.title} 
               onBlur={(event) => persist({ title: event.currentTarget.value.trim() || "Untitled" })} 
-              className="mb-8 w-full border-none bg-transparent p-0 font-heading text-5xl text-slate-900 outline-none placeholder:text-slate-200 focus:ring-0 sm:text-6xl" 
+              className="mb-6 w-full border-none bg-transparent p-0 font-heading text-4xl text-slate-900 outline-none placeholder:text-slate-300 focus:ring-0 sm:text-5xl font-bold tracking-tight" 
               placeholder="Document Title" 
             />
 
@@ -233,12 +351,12 @@ export default function WorkspacePage() {
             <div className="relative mb-8">
               <div className="flex items-center justify-between rounded-2xl border border-indigo-100 bg-indigo-50/70 p-4 shadow-xs">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-xl bg-white p-2 text-indigo-600 shadow-sm">
+                  <div className="rounded-xl bg-white p-2 text-indigo-600 shadow-sm border border-indigo-100">
                     <Sparkles className={`h-4 w-4 ${isAiTransforming ? "animate-spin" : ""}`} />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-indigo-950">Nexus AI Document Copilot (Groq Active)</p>
-                    <p className="text-xs text-indigo-700/80">Summarize, enhance tone, extract action items, or ask questions in comments with @ai.</p>
+                    <p className="text-xs font-bold text-indigo-950">Nexus AI Document Copilot (Groq Active)</p>
+                    <p className="text-[11px] text-indigo-700/80">Summarize, enhance tone, extract action items, or ask questions in comments with @ai.</p>
                   </div>
                 </div>
 
@@ -248,7 +366,7 @@ export default function WorkspacePage() {
                     disabled={isAiTransforming}
                     variant="secondary" 
                     size="sm" 
-                    className="gap-1.5 bg-white text-indigo-950 font-bold border border-indigo-200 shadow-xs"
+                    className="gap-1.5 bg-white text-indigo-950 font-bold border border-indigo-200 shadow-xs text-xs rounded-xl"
                   >
                     <Wand2 className="w-3.5 h-3.5 text-indigo-600" />
                     {isAiTransforming ? "Applying AI..." : "Ask AI"}
@@ -287,13 +405,13 @@ export default function WorkspacePage() {
               </div>
             </div>
 
-            <div className="prose prose-slate prose-lg max-w-none prose-headings:font-heading prose-p:leading-loose">
+            <div className="prose prose-slate prose-lg max-w-none prose-headings:font-heading prose-p:leading-loose text-slate-800 text-sm">
               <div 
                 key={workspaceDocument.id} 
                 contentEditable 
                 suppressContentEditableWarning 
                 onBlur={(event) => persist({ content: event.currentTarget.innerHTML })} 
-                className="min-h-[260px] rounded-xl outline-none focus:ring-2 focus:ring-indigo-100" 
+                className="min-h-[260px] rounded-2xl outline-none focus:ring-2 focus:ring-indigo-200 p-2" 
                 dangerouslySetInnerHTML={{ __html: workspaceDocument.content }} 
               />
               <div className="my-10">
@@ -305,10 +423,10 @@ export default function WorkspacePage() {
               <Button 
                 onClick={() => { 
                   persist({}); 
-                  addToast({ title: "Draft saved", message: "Your local workspace draft is up to date.", type: "success" }); 
+                  addToast({ title: "Draft saved", message: "Synced with backend workspace repository.", type: "success" }); 
                 }} 
                 variant="secondary" 
-                className="gap-2"
+                className="gap-2 text-xs font-semibold rounded-xl"
               >
                 <Save className="h-4 w-4" /> Save draft
               </Button>

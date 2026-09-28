@@ -18,7 +18,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { useToast } from "@/components/ui/Toast";
+import { useToast } from "@/components/ui/ToastNotifications";
 
 type CampaignStage = 
   | "Ideation" 

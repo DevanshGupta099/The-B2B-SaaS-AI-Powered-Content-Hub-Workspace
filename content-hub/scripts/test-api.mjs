@@ -97,6 +97,20 @@ async function runTests() {
     preserveGlossary: ["Nexus", "Brand Kit", "CRDT"],
   });
 
+  // 10. Governed Workspaces Seed Store
+  await testEndpoint("Governed Workspaces Repository", "/api/workspaces");
+
+  // 11. Collaborative Documents Store
+  await testEndpoint("Collaborative Documents Repository", "/api/documents");
+
+  // 12. Digital Asset Management (DAM) Media
+  await testEndpoint("Digital Asset Management (DAM)", "/api/dam");
+
+  // 13. Executive Workspace Intelligence Report
+  await testEndpoint("Executive Intelligence Report Synthesis", "/api/report", "POST", {
+    focusArea: "Enterprise Q4 Content Throughput & Governance"
+  });
+
   console.log("==================================================");
   console.log(`Results: ${passed} / ${total} Endpoints Passed (${Math.round((passed / total) * 100)}%)`);
   console.log("==================================================");

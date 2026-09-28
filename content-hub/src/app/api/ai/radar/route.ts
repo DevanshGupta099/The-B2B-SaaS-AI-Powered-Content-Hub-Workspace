@@ -72,8 +72,9 @@ Return strictly valid JSON with no markdown tags:
     }
 
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Radar API Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to analyze competitor move" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Failed to analyze competitor move";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

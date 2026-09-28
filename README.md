@@ -34,21 +34,21 @@ Nexus unifies every stage of content production into a single governed operating
 
 ```mermaid
 graph TD
-    Client[Web Browser / Next.js 16 UI] -->|HTTP / JSON| APIRoutes[Next.js App Router API Layer]
+    Client["Web Browser / Next.js 16 UI"] -->|HTTP / JSON| APIRoutes["Next.js App Router API Layer"]
     
-    subgraph "AI Services & Orchestrator (ai-service.ts)"
-        APIRoutes --> Health[/api/ai/health]
-        APIRoutes --> Generate[/api/ai/generate]
-        APIRoutes --> BrandCheck[/api/ai/brand-check]
-        APIRoutes --> Atomize[/api/ai/atomize]
-        APIRoutes --> Embed[/api/ai/embed]
-        APIRoutes --> Search[/api/ai/semantic-search]
-        APIRoutes --> SEO[/api/ai/seo-audit]
-        APIRoutes --> Radar[/api/ai/radar]
-        APIRoutes --> Translate[/api/ai/translate]
+    subgraph AI_Services ["AI Services & Orchestrator (ai-service.ts)"]
+        APIRoutes --> Health["/api/ai/health"]
+        APIRoutes --> Generate["/api/ai/generate"]
+        APIRoutes --> BrandCheck["/api/ai/brand-check"]
+        APIRoutes --> Atomize["/api/ai/atomize"]
+        APIRoutes --> Embed["/api/ai/embed"]
+        APIRoutes --> Search["/api/ai/semantic-search"]
+        APIRoutes --> SEO["/api/ai/seo-audit"]
+        APIRoutes --> Radar["/api/ai/radar"]
+        APIRoutes --> Translate["/api/ai/translate"]
     end
 
-    subgraph "External Providers & Fallbacks"
+    subgraph External_Providers ["External Providers & Fallbacks"]
         Generate -->|Sub-second LPUs| GroqAPI["Groq Cloud (qwen/qwen3.8-27b)"]
         Embed -->|384d Dense Vectors| HFRouter["Hugging Face Router (BAAI/bge-small-en-v1.5)"]
         Search -->|Vector Cosine Math| VectorEngine["In-Memory RAG Cosine Engine"]
@@ -203,10 +203,31 @@ node scripts/test-api.mjs
 [PASS] SEO Intelligence & SERP Audit - Status: 200
 [PASS] Competitive Radar Intelligence - Status: 200
 [PASS] Global Transcreation Engine - Status: 200
+[PASS] Governed Workspaces Repository - Status: 200
+[PASS] Collaborative Documents Repository - Status: 200
+[PASS] Digital Asset Management (DAM) - Status: 200
+[PASS] Executive Intelligence Report Synthesis - Status: 200
 ==================================================
-Results: 9 / 9 Endpoints Passed (100%)
+Results: 13 / 13 Endpoints Passed (100%)
 ==================================================
 ```
+
+---
+
+## 📚 Project Documentation & Skills
+
+Comprehensive documentation and operator runbooks are maintained in the [`docs/`](docs/) directory:
+
+- 🏛️ **[System Architecture](docs/ARCHITECTURE.md)**: Data flow, Next.js 16 layer hierarchy, state store, and model orchestration.
+- 📡 **[API Reference](docs/API_REFERENCE.md)**: Full REST & AI endpoints catalog with request/response schemas and rate-limit handling.
+- 🚢 **[Deployment Runbook](docs/DEPLOYMENT.md)**: Docker containerization, Vercel edge deployment, and environment variable matrix.
+- 🛠️ **[Operations & Maintenance](docs/MAINTENANCE.md)**: Troubleshooting guide, Groq 1,000 OTPM rate governor, and backup procedures.
+
+### Antigravity & Agentic Skills
+Specialized skills are pre-configured in `.agents/skills/` and mirrored in [`docs/skills/`](docs/skills/):
+- **[Nexus AI Orchestration](docs/skills/nexus-ai-orchestration.md)**: Recipes for Groq LPUs, token headroom management, and slash actions.
+- **[DAM & Media Management](docs/skills/dam-and-media.md)**: Ingestion, AI auto-tagging, aspect ratio rendering, and visual search.
+- **[Governance & Compliance](docs/skills/governance-and-compliance.md)**: Deterministic voice linters, RBAC roles, and audit logging.
 
 ---
 

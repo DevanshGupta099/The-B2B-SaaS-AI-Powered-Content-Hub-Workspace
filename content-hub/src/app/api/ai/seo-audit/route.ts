@@ -65,8 +65,9 @@ Return strictly valid JSON with no markdown formatting:
     }
 
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("SEO Audit API Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to run SEO audit" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Failed to run SEO audit";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -17,8 +17,8 @@ export async function GET() {
     } else {
       groqStatus = "missing_api_key";
     }
-  } catch (err: any) {
-    groqStatus = `unreachable: ${err.message}`;
+  } catch (err: unknown) {
+    groqStatus = `unreachable: ${err instanceof Error ? err.message : String(err)}`;
   }
 
   // Check HuggingFace
@@ -38,8 +38,8 @@ export async function GET() {
     } else {
       hfStatus = "missing_api_key";
     }
-  } catch (err: any) {
-    hfStatus = `unreachable: ${err.message}`;
+  } catch (err: unknown) {
+    hfStatus = `unreachable: ${err instanceof Error ? err.message : String(err)}`;
   }
 
   // Check Ollama

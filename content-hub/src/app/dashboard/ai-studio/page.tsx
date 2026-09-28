@@ -16,7 +16,7 @@ import {
   Download
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { useToast } from "@/components/ui/Toast";
+import { useToast } from "@/components/ui/ToastNotifications";
 import { getWorkspaceData } from "@/lib/workspace-data";
 import { createDocument } from "@/lib/documents";
 

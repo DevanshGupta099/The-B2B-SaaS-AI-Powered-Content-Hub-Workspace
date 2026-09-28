@@ -37,8 +37,9 @@ Return ONLY the rewritten, polished draft text with zero buzzwords and zero prea
       report,
       fixedText,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Brand Check Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to analyze brand voice" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Failed to analyze brand voice";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

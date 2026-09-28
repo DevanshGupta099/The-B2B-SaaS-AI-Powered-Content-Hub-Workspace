@@ -15,7 +15,7 @@ import {
   Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { useToast } from "@/components/ui/Toast";
+import { useToast } from "@/components/ui/ToastNotifications";
 
 type SettingsTab = "ai" | "profile" | "team" | "billing" | "integrations" | "security";
 
@@ -35,11 +35,21 @@ const initialAuditLogs: AuditLogEntry[] = [
   { id: "log-4", user: "System Webhook", action: "Syndicated draft to Webflow CMS staging collection", ip: "35.192.0.1", timestamp: "3 hours ago", status: "Success" },
 ];
 
+interface AiHealthData {
+  status: string;
+  latencyMs: number;
+  providers: {
+    groq: { status: string; model: string };
+    huggingface: { status: string; dimensions: number };
+    ollama: { status: string };
+  };
+}
+
 export default function SettingsPage() {
   const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState<SettingsTab>("ai");
   const [isTestingAi, setIsTestingAi] = useState(false);
-  const [aiHealth, setAiHealth] = useState<any>(null);
+  const [aiHealth, setAiHealth] = useState<AiHealthData | null>(null);
 
   // Team RBAC state
   const [teamMembers, setTeamMembers] = useState([
@@ -150,8 +160,9 @@ export default function SettingsPage() {
                           message: `Ping completed in ${data.latencyMs}ms. Groq (${data.providers.groq.model}) & Hugging Face (${data.providers.huggingface.dimensions}d) verified.`,
                           type: data.status === "healthy" ? "success" : "info"
                         });
-                      } catch (err: any) {
-                        addToast({ title: "Health check failed", message: err.message, type: "error" });
+                      } catch (err: unknown) {
+                        const message = err instanceof Error ? err.message : "Health check failed";
+                        addToast({ title: "Health check failed", message, type: "error" });
                       } finally {
                         setIsTestingAi(false);
                       }
