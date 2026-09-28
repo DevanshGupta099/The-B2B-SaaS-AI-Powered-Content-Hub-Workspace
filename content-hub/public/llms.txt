@@ -1,0 +1,27 @@
+# Nexus: AI-Powered B2B SaaS Content Hub & Workspace
+
+> The enterprise AI content operating system for planning, generating, brand-checking, approving, and distributing multi-channel content at scale.
+
+## Core Capabilities
+- **Content Atomizer**: 1-to-many repurposing engine transforming whitepapers into LinkedIn posts, X threads, newsletters, video scripts, and SEO meta.
+- **Brand Voice & Rule Engine**: Deterministic regex and semantic linter preventing brand voice drift, unauthorized claims, and forbidden buzzwords.
+- **SEO & Search Intelligence**: Real-time content scoring, competitor SERP comparison, and People Also Ask schema injection.
+- **Custom AI Agents Studio**: Autonomous assistants (Technical Ghostwriter, Demand Gen Copywriter, PR Lead) with customizable temperature and knowledge grounding.
+- **Multi-Channel Publishing**: Native syndication to Webflow, WordPress, HubSpot, Substack, LinkedIn, and Twitter/X.
+- **Digital Asset Management (DAM)**: Natural language visual search, smart collections, and generative media studio.
+- **Client Review Portal**: Frictionless magic link review hubs with digital approval stamps and zero seat licenses.
+
+## Key Routes & Sitemaps
+- [Homepage](https://nexus.ai/): Enterprise overview, 3D interactive hero, live Atomizer simulator, and ROI calculator.
+- [Features](https://nexus.ai/features): Comprehensive module breakdown.
+- [Templates](https://nexus.ai/templates): 50+ pre-built workflow prompt blueprints.
+- [Solutions](https://nexus.ai/solutions): Tailored playbooks for CMOs, DevRel teams, Demand Gen, and Agencies.
+- [Pricing](https://nexus.ai/pricing): Transparent token and seat tiers (Starter, Pro, Enterprise).
+- [Security & Trust](https://nexus.ai/security): SOC2 Type II, zero AI retention policy, SAML SSO, and AES-256 encryption.
+- [System Status](https://nexus.ai/status): Real-time uptime telemetry and edge region statuses.
+- [Free Headline Generator](https://nexus.ai/free-tools/headline-generator): Free AI hook and title virality scoring tool.
+- [Free Brand Voice Checker](https://nexus.ai/free-tools/brand-voice-checker): Free buzzword linter.
+
+## Technical Specifications
+- Built with Next.js 16 (App Router), TypeScript, Tailwind CSS, and edge WebSockets for real-time collaboration.
+- AI Backends: Claude 3.7 Sonnet, GPT-4o, Gemini 2.0 Pro, DeepSeek R1, and fine-tuned private models.
