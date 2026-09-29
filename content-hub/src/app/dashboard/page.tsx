@@ -19,7 +19,6 @@ import {
 import { AvatarGroup } from "@/components/ui/AvatarGroup";
 import { Avatar } from "@/components/ui/Avatar";
 import { getAvatarUrl } from "@/lib/avatar";
-import Image from "next/image";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/ToastNotifications";

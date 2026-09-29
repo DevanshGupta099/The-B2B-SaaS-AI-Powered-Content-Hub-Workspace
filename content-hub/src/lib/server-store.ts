@@ -3,6 +3,8 @@
  * Central backend source of truth for workspaces, documents, DAM media, and activity logs.
  */
 
+import { hashPassword, verifyPassword } from "./auth-crypto";
+
 export interface BackendWorkspace {
   id: string;
   name: string;
@@ -625,7 +627,6 @@ class BackendStore {
   }
 
   createUser(data: { name: string; email: string; password: string; role?: string; workspaceName?: string }): Omit<BackendUser, "password"> {
-    const { hashPassword } = require("./auth-crypto");
     const hashedPassword = hashPassword(data.password);
     const newUser: BackendUser = {
       id: `user-${Date.now()}`,
@@ -672,7 +673,6 @@ class BackendStore {
     if (!user) {
       return { valid: false, reason: "No account found with this email address" };
     }
-    const { verifyPassword } = require("./auth-crypto");
     if (!verifyPassword(password, user.password)) {
       return { valid: false, reason: "Incorrect password entered" };
     }
