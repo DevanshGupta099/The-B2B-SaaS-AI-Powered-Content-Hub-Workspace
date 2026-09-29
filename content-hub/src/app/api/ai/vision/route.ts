@@ -12,15 +12,91 @@ interface VisionAnalysisResult {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { image, fileName, mimeType } = body;
+    const { image, fileName, mimeType: providedMimeType } = body;
 
     if (!image) {
       return NextResponse.json({ error: "No image data provided" }, { status: 400 });
     }
 
+    // Extract pure base64 data and mimeType
+    let base64Data = image;
+    let mimeType = providedMimeType || "image/jpeg";
+
+    if (image.startsWith("data:")) {
+      const parts = image.split(",");
+      const match = parts[0].match(/:(.*?);/);
+      if (match) mimeType = match[1];
+      base64Data = parts[1] || parts[0];
+    }
+
+    const geminiKey = process.env.GEMINI_API_KEY;
     const groqApiKey = process.env.GROQ_API_KEY;
 
-    // 1. If Groq API Key is available, attempt multi-modal vision inference via Groq
+    // 1. Google Gemini Native Multimodal Vision (Primary)
+    if (geminiKey && !geminiKey.includes("your-")) {
+      try {
+        const geminiRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${geminiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    {
+                      text: `Analyze this image for an enterprise content hub.
+Extract structured metadata in strictly valid JSON format with keys:
+- "title": A concise headline describing the image (5-8 words)
+- "type": Content category (e.g., "UI Dashboard", "Marketing Infographic", "Architecture Diagram", "Product Screenshot", "Photograph", "Document Scan")
+- "entities": Array of 3 to 6 detected entities, visual components, or topics
+- "summary": A 2-3 sentence strategic executive summary describing what the image depicts
+- "extractedText": Any text visible inside the image (OCR transcription), or "No text detected"
+- "keyInsights": Array of 2 to 3 actionable business or design observations
+
+Ensure the response is valid JSON matching this schema.`
+                    },
+                    {
+                      inlineData: {
+                        mimeType,
+                        data: base64Data
+                      }
+                    }
+                  ]
+                }
+              ],
+              generationConfig: {
+                responseMimeType: "application/json"
+              }
+            })
+          }
+        );
+
+        if (geminiRes.ok) {
+          const geminiData = await geminiRes.json();
+          const rawText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (rawText) {
+            try {
+              const cleaned = rawText.replace(/```json/gi, "").replace(/```/g, "").trim();
+              const parsed: VisionAnalysisResult = JSON.parse(cleaned);
+              return NextResponse.json({
+                success: true,
+                provider: "google-gemini-3.5 (Multimodal Vision)",
+                data: parsed
+              });
+            } catch (pErr) {
+              console.warn("Failed to parse Gemini Vision JSON:", pErr);
+            }
+          }
+        } else {
+          console.warn("Gemini Vision HTTP non-200:", geminiRes.status, await geminiRes.text());
+        }
+      } catch (geminiErr) {
+        console.warn("Gemini Vision request error:", geminiErr);
+      }
+    }
+
+    // 2. Groq Multimodal Vision Fallback (LLaMA 3.2 Vision)
     if (groqApiKey && !groqApiKey.includes("your-")) {
       try {
         const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -51,7 +127,7 @@ Output ONLY raw JSON matching this schema.`
                   {
                     type: "image_url",
                     image_url: {
-                      url: image.startsWith("data:") ? image : `data:${mimeType || "image/jpeg"};base64,${image}`
+                      url: `data:${mimeType};base64,${base64Data}`
                     }
                   }
                 ]
@@ -75,23 +151,19 @@ Output ONLY raw JSON matching this schema.`
                 data: parsed
               });
             } catch {
-              // Fallback to text parsing if not clean JSON
+              // Fallback to heuristic
             }
           }
-        } else {
-          console.warn("Groq Vision API returned non-200 status:", groqResponse.status);
         }
       } catch (groqErr) {
         console.warn("Groq Vision request error:", groqErr);
       }
     }
 
-    // 2. Intelligent High-Fidelity Heuristic Fallback
-    // Provides realistic structural extraction based on uploaded image attributes
+    // 3. Intelligent High-Fidelity Heuristic Fallback
     const nameWithoutExt = (fileName || "Uploaded Graphic").replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
     const formattedTitle = nameWithoutExt.charAt(0).toUpperCase() + nameWithoutExt.slice(1);
 
-    // Heuristically detect probable type based on filename and mime
     const isChart = /chart|graph|dash|metric|revenue|kpi|analytics/i.test(nameWithoutExt);
     const isDiagram = /diagram|flow|arch|infra|pipeline|system|cloud/i.test(nameWithoutExt);
     const isLogo = /logo|brand|icon|vector|emblem/i.test(nameWithoutExt);

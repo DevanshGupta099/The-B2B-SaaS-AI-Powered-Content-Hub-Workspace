@@ -1,6 +1,7 @@
 /**
  * Nexus B2B SaaS AI Service Engine
- * Unified orchestrator for Groq LLMs, HuggingFace Dense Embeddings, and Ollama.
+ * Resilient multi-provider orchestrator supporting Groq LPUs, Google Gemini 3.5,
+ * OpenRouter, HuggingFace Dense Embeddings, and Local Ollama.
  */
 
 export interface LLMMessage {
@@ -50,10 +51,233 @@ export interface BrandComplianceReport {
   analyzedLength: number;
 }
 
+/**
+ * Google Gemini Execution Engine (Gemini 3.5 Flash Lite / 3.1 Flash Lite)
+ */
+async function callGemini(
+  messages: LLMMessage[],
+  systemPrompt?: string,
+  options?: LLMRequestOptions,
+  startTime: number = Date.now()
+): Promise<LLMResponse> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is not configured.");
+  }
+
+  const model = options?.model && options.model.startsWith("gemini")
+    ? options.model
+    : (process.env.GEMINI_MODEL || "gemini-3.5-flash-lite");
+
+  const nonSystemMessages = messages.filter(m => m.role !== "system");
+  const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+
+  for (const msg of nonSystemMessages) {
+    const role = msg.role === "assistant" ? "model" : "user";
+    const last = contents[contents.length - 1];
+    if (last && last.role === role) {
+      last.parts.push({ text: msg.content });
+    } else {
+      contents.push({ role, parts: [{ text: msg.content }] });
+    }
+  }
+
+  if (contents.length === 0) {
+    contents.push({ role: "user", parts: [{ text: "Proceed with enterprise request." }] });
+  }
+
+  const payload: Record<string, unknown> = {
+    contents,
+    generationConfig: {
+      temperature: options?.temperature ?? 0.7,
+      maxOutputTokens: options?.maxTokens ?? 1500,
+    }
+  };
+
+  const sys = systemPrompt || messages.find(m => m.role === "system")?.content;
+  if (sys) {
+    payload.systemInstruction = { parts: [{ text: sys }] };
+  }
+
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    // Spikes in demand: automatic retry with stable fallback model
+    if (model !== "gemini-3.1-flash-lite" && (res.status === 429 || res.status === 503 || errText.includes("high demand"))) {
+      console.warn(`Gemini ${model} high demand, falling back to gemini-3.1-flash-lite...`);
+      return callGemini(messages, systemPrompt, { ...options, messages, model: "gemini-3.1-flash-lite" }, startTime);
+    }
+    throw new Error(`Gemini API Error (${res.status}): ${errText}`);
+  }
+
+  const data = await res.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+  const latencyMs = Date.now() - startTime;
+
+  return {
+    text,
+    model: data.modelVersion || model,
+    provider: "gemini",
+    latencyMs,
+    tokens: {
+      prompt: data.usageMetadata?.promptTokenCount || 0,
+      completion: data.usageMetadata?.candidatesTokenCount || 0,
+      total: data.usageMetadata?.totalTokenCount || 0,
+    }
+  };
+}
+
+/**
+ * OpenRouter Execution Engine (Free tier & multi-model router)
+ */
+async function callOpenRouter(
+  allMessages: LLMMessage[],
+  options?: LLMRequestOptions,
+  startTime: number = Date.now()
+): Promise<LLMResponse> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENROUTER_API_KEY is not configured.");
+  }
+
+  const model = options?.model && (options.model.includes("/") || options.model.includes(":free"))
+    ? options.model
+    : (process.env.OPENROUTER_MODEL || "liquid/lfm-2.5-2.6b:free");
+
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "https://nexus-content-hub.vercel.app",
+      "X-Title": "Nexus Content OS",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model,
+      messages: allMessages,
+      temperature: options?.temperature ?? 0.7,
+      max_tokens: options?.maxTokens ?? 1000,
+    })
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    if (model !== "inclusionai/ling-3.0-flash-sante:free") {
+      console.warn(`OpenRouter (${model}) issue, attempting fallback free model...`);
+      return callOpenRouter(allMessages, { ...options, messages: allMessages, model: "inclusionai/ling-3.0-flash-sante:free" }, startTime);
+    }
+    throw new Error(`OpenRouter API Error (${res.status}): ${errText}`);
+  }
+
+  const data = await res.json();
+  const choice = data.choices?.[0];
+  const latencyMs = Date.now() - startTime;
+
+  return {
+    text: choice?.message?.content || "",
+    model: data.model || model,
+    provider: "openrouter",
+    latencyMs,
+    tokens: {
+      prompt: data.usage?.prompt_tokens || 0,
+      completion: data.usage?.completion_tokens || 0,
+      total: data.usage?.total_tokens || 0,
+    }
+  };
+}
+
+/**
+ * Groq LPU Execution Engine
+ */
+async function callGroq(
+  allMessages: LLMMessage[],
+  options?: LLMRequestOptions,
+  startTime: number = Date.now()
+): Promise<LLMResponse> {
+  const groqApiKey = process.env.GROQ_API_KEY || "";
+  if (!groqApiKey) {
+    throw new Error("GROQ_API_KEY is not configured.");
+  }
+
+  const groqModel = options?.model || process.env.LLM_MODEL || "qwen/qwen3.8-27b";
+  const maxTokens = options?.maxTokens ?? 700;
+
+  let res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${groqApiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: groqModel,
+      messages: allMessages,
+      temperature: options?.temperature ?? 0.7,
+      max_tokens: maxTokens,
+    }),
+  });
+
+  // Intelligent backoff on rate limit
+  if (res.status === 429) {
+    const errorBody = await res.text();
+    const waitMatch = errorBody.match(/try again in ([\d\.]+)s/i);
+    const usedMatch = errorBody.match(/Used\s+(\d+)/i);
+    const waitSec = waitMatch ? Math.min(Math.ceil(parseFloat(waitMatch[1]) + 0.5), 6) : 3;
+
+    if (waitSec <= 4) {
+      await new Promise(r => setTimeout(r, waitSec * 1000));
+      const used = usedMatch ? parseInt(usedMatch[1]) : 700;
+      const safeTokens = Math.max(120, Math.min(maxTokens, 980 - used));
+
+      res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${groqApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: groqModel,
+          messages: allMessages,
+          temperature: options?.temperature ?? 0.7,
+          max_tokens: safeTokens,
+        }),
+      });
+    }
+  }
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Groq API Error (${res.status}): ${errorText}`);
+  }
+
+  const data = await res.json();
+  const latencyMs = Date.now() - startTime;
+  const choice = data.choices?.[0];
+
+  return {
+    text: choice?.message?.content || "",
+    model: data.model || groqModel,
+    provider: "groq",
+    latencyMs,
+    tokens: {
+      prompt: data.usage?.prompt_tokens || 0,
+      completion: data.usage?.completion_tokens || 0,
+      total: data.usage?.total_tokens || 0,
+    },
+  };
+}
+
+/**
+ * Main Unified Completion Router with Cascading Multi-Provider Failover:
+ * Primary: Groq -> Secondary: Google Gemini -> Tertiary: OpenRouter -> Quaternary: Local Ollama
+ */
 export async function generateChatCompletion(options: LLMRequestOptions): Promise<LLMResponse> {
   const startTime = Date.now();
   const provider = (options.provider || process.env.LLM_PROVIDER || "groq").toLowerCase();
-  const targetModel = options.model || process.env.LLM_MODEL || "qwen/qwen3.8-27b";
 
   const allMessages: LLMMessage[] = [];
   if (options.systemPrompt) {
@@ -61,7 +285,33 @@ export async function generateChatCompletion(options: LLMRequestOptions): Promis
   }
   allMessages.push(...options.messages);
 
-  // 1. Try Ollama if explicitly requested
+  // 1. Explicitly Requested Gemini
+  if (provider === "gemini") {
+    try {
+      return await callGemini(allMessages, options.systemPrompt, options, startTime);
+    } catch (err) {
+      console.warn("Direct Gemini call failed, attempting OpenRouter fallback:", err);
+      if (process.env.OPENROUTER_API_KEY) {
+        return await callOpenRouter(allMessages, options, startTime);
+      }
+      throw err;
+    }
+  }
+
+  // 2. Explicitly Requested OpenRouter
+  if (provider === "openrouter") {
+    try {
+      return await callOpenRouter(allMessages, options, startTime);
+    } catch (err) {
+      console.warn("Direct OpenRouter call failed, attempting Gemini fallback:", err);
+      if (process.env.GEMINI_API_KEY) {
+        return await callGemini(allMessages, options.systemPrompt, options, startTime);
+      }
+      throw err;
+    }
+  }
+
+  // 3. Explicitly Requested Ollama
   if (provider === "ollama") {
     try {
       const ollamaUrl = process.env.OLLAMA_URL || "http://localhost:11434";
@@ -96,82 +346,41 @@ export async function generateChatCompletion(options: LLMRequestOptions): Promis
           },
         };
       }
-      console.warn("Ollama request failed, falling back to Groq:", await res.text());
     } catch (err) {
-      console.warn("Ollama unavailable, falling back to Groq:", err);
+      console.warn("Ollama unavailable, continuing to cloud providers:", err);
     }
   }
 
-  // 2. Default or Fallback to Groq
-  const groqApiKey = process.env.GROQ_API_KEY || "";
-  if (!groqApiKey) {
-    throw new Error("GROQ_API_KEY is not set. Please add it to your .env or .env.local file.");
-  }
-  const groqModel = targetModel;
-
-  const maxTokens = options.maxTokens ?? 700;
-
-  let res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${groqApiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: groqModel,
-      messages: allMessages,
-      temperature: options.temperature ?? 0.7,
-      max_tokens: maxTokens,
-    }),
-  });
-
-  // Intelligent backoff and token optimization on rate limits (e.g. OTPM 1000 limit)
-  if (res.status === 429) {
-    const errorBody = await res.text();
-    const waitMatch = errorBody.match(/try again in ([\d\.]+)s/i);
-    const usedMatch = errorBody.match(/Used\s+(\d+)/i);
-    const waitSec = waitMatch ? Math.min(Math.ceil(parseFloat(waitMatch[1]) + 0.5), 10) : 4;
-    console.warn(`Groq rate limit on ${groqModel}, waiting ${waitSec}s...`);
-    await new Promise(r => setTimeout(r, waitSec * 1000));
-
-    const used = usedMatch ? parseInt(usedMatch[1]) : 700;
-    const safeTokens = Math.max(120, Math.min(maxTokens, 980 - used));
-
-    res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${groqApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: groqModel,
-        messages: allMessages,
-        temperature: options.temperature ?? 0.7,
-        max_tokens: safeTokens,
-      }),
-    });
+  // 4. Default / Resilient Cascade: Groq -> Gemini -> OpenRouter
+  try {
+    if (process.env.GROQ_API_KEY) {
+      return await callGroq(allMessages, options, startTime);
+    }
+  } catch (groqError) {
+    console.warn("Groq encounter failed/rate-limited. Cascading to Google Gemini...", groqError);
   }
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(`Groq API Error (${res.status}): ${errorText}`);
+  // Fallback 1: Google Gemini
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      return await callGemini(allMessages, options.systemPrompt, options, startTime);
+    } catch (geminiError) {
+      console.warn("Gemini cascade failed. Cascading to OpenRouter...", geminiError);
+    }
   }
 
-  const data = await res.json();
-  const latencyMs = Date.now() - startTime;
-  const choice = data.choices?.[0];
+  // Fallback 2: OpenRouter
+  if (process.env.OPENROUTER_API_KEY) {
+    try {
+      return await callOpenRouter(allMessages, options, startTime);
+    } catch (openRouterError) {
+      console.warn("OpenRouter cascade failed:", openRouterError);
+    }
+  }
 
-  return {
-    text: choice?.message?.content || "",
-    model: data.model || groqModel,
-    provider: "groq",
-    latencyMs,
-    tokens: {
-      prompt: data.usage?.prompt_tokens || 0,
-      completion: data.usage?.completion_tokens || 0,
-      total: data.usage?.total_tokens || 0,
-    },
-  };
+  throw new Error(
+    "All configured LLM providers (Groq, Google Gemini, OpenRouter) were unavailable. Please verify API quotas and environment variables."
+  );
 }
 
 /**
@@ -229,7 +438,6 @@ export async function generateEmbedding(text: string): Promise<EmbeddingResponse
   }
 
   const raw = await res.json();
-  // BAAI/bge-small-en-v1.5 returns number[] or [number[]]
   let vector: number[] = [];
   if (Array.isArray(raw)) {
     if (typeof raw[0] === "number") {
@@ -284,7 +492,6 @@ export function evaluateBrandVoice(
   const infractions: BrandInfraction[] = [];
 
   for (const term of restrictedList) {
-    // Regex for whole word or exact phrase match
     const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(`\\b${escaped}\\b`, "i");
     if (regex.test(lower)) {
@@ -296,7 +503,6 @@ export function evaluateBrandVoice(
     }
   }
 
-  // Calculate score based on infractions per word count
   const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
   let penalty = infractions.length * 18;
   if (wordCount < 10) penalty = Math.min(penalty, 30);
