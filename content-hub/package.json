@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "node ./node_modules/next/dist/bin/next dev",
-    "build": "node ./node_modules/next/dist/bin/next build",
+    "build": "node ./node_modules/next/dist/bin/next build --webpack",
     "start": "node ./node_modules/next/dist/bin/next start",
-    "lint": "eslint"
+    "lint": "node ./node_modules/eslint/bin/eslint.js ."
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.20",

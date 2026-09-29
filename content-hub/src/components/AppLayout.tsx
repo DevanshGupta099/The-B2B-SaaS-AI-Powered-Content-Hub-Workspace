@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import {
   Search,
@@ -29,10 +29,23 @@ import {
   Building2,
   Cpu,
   Layers,
-  Image as ImageIcon
+  Image as ImageIcon,
+  CheckCircle2,
+  AlertCircle,
+  ShieldCheck,
+  LogOut,
+  User as UserIcon,
+  Check,
+  Trash2,
+  ExternalLink,
+  CreditCard,
+  Key,
+  Lock,
+  ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useToast } from "@/components/ui/ToastNotifications";
 
 export interface WorkspaceFolder {
   id: string;
@@ -44,6 +57,28 @@ export interface AppLayoutProps {
   children: React.ReactNode;
   rightSidebarContent?: React.ReactNode;
   folders?: WorkspaceFolder[];
+}
+
+interface NotificationItem {
+  id: string;
+  title: string;
+  message: string;
+  category: "approvals" | "guardrails" | "system" | "documents";
+  time: string;
+  read: boolean;
+  link?: string;
+}
+
+interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  title: string;
+  bio: string;
+  timezone: string;
+  avatarUrl: string;
+  department: string;
 }
 
 function NavItem({ icon: Icon, label, shortcut, href = "#", isActive }: { icon: React.ElementType, label: string, shortcut?: string, href?: string, isActive?: boolean }) {
@@ -66,6 +101,9 @@ function NavItem({ icon: Icon, label, shortcut, href = "#", isActive }: { icon: 
 }
 
 export function AppLayout({ children, rightSidebarContent, folders = [] }: AppLayoutProps) {
+  const { addToast } = useToast();
+  const pathname = usePathname() || "";
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
     workspace: true,
@@ -73,8 +111,130 @@ export function AppLayout({ children, rightSidebarContent, folders = [] }: AppLa
     optimize: true,
     manage: true
   });
-  const pathname = usePathname() || "";
-  
+
+  // Notifications State
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [activeNotifTab, setActiveNotifTab] = useState<"all" | "guardrails" | "approvals" | "system">("all");
+  const notificationsRef = useRef<HTMLDivElement>(null);
+
+  // Profile Popover State
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [profile, setProfile] = useState<UserProfile>({
+    id: "user-1",
+    name: "Devansh Gupta",
+    email: "devanshgupta091@gmail.com",
+    role: "Workspace Owner & Chief Architect",
+    title: "Principal Engineer",
+    bio: "Architecting governed multi-model content infrastructure.",
+    timezone: "Asia/Kolkata (IST)",
+    avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+    department: "Core Platform Architecture"
+  });
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // Fetch Profile & Notifications on mount
+  useEffect(() => {
+    async function loadHeaderData() {
+      try {
+        const [profileRes, notifsRes] = await Promise.all([
+          fetch("/api/profile"),
+          fetch("/api/notifications")
+        ]);
+
+        if (profileRes.ok) {
+          const pData = await profileRes.json();
+          if (pData.profile) setProfile(pData.profile);
+        }
+
+        if (notifsRes.ok) {
+          const nData = await notifsRes.json();
+          if (nData.notifications) {
+            setNotifications(nData.notifications);
+            setUnreadCount(nData.unreadCount ?? 0);
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to load header profile/notifications:", err);
+      }
+    }
+
+    loadHeaderData();
+  }, [pathname]);
+
+  // Click outside listener for notifications & profile
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setIsNotificationsOpen(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Mark single notification read
+  const handleMarkRead = async (id: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    try {
+      const res = await fetch("/api/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
+    } catch (err) {
+      console.error("Failed to mark notification read:", err);
+    }
+  };
+
+  // Mark all read
+  const handleMarkAllRead = async () => {
+    try {
+      const res = await fetch("/api/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "mark_all_read" })
+      });
+
+      if (res.ok) {
+        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+        setUnreadCount(0);
+        addToast({ title: "Notifications cleared", message: "All notifications marked as read.", type: "success" });
+      }
+    } catch (err) {
+      console.error("Failed to mark all read:", err);
+    }
+  };
+
+  // Clear notifications
+  const handleClearNotifications = async () => {
+    try {
+      const res = await fetch("/api/notifications", { method: "DELETE" });
+      if (res.ok) {
+        setNotifications([]);
+        setUnreadCount(0);
+        addToast({ title: "Inbox Cleared", message: "All alerts removed.", type: "info" });
+      }
+    } catch (err) {
+      console.error("Failed to clear notifications:", err);
+    }
+  };
+
+  const filteredNotifications = notifications.filter(n => {
+    if (activeNotifTab === "all") return true;
+    return n.category === activeNotifTab;
+  });
+
   const groups = [
     {
       id: "workspace",
@@ -131,7 +291,7 @@ export function AppLayout({ children, rightSidebarContent, folders = [] }: AppLa
       )}>
         <div className="p-5 flex items-center justify-between border-b border-slate-200/60 shrink-0 h-16">
           <Link href="/dashboard" className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-[#020617] flex items-center justify-center shadow-md">
+            <div className="w-8 h-8 rounded-xl bg-[#020617] border border-[#1e293b] flex items-center justify-center shadow-md">
               <span className="text-white font-bold text-lg">N</span>
             </div>
             <div className="flex flex-col">
@@ -190,13 +350,13 @@ export function AppLayout({ children, rightSidebarContent, folders = [] }: AppLa
         </div>
 
         <div className="p-3 border-t border-slate-200/60 shrink-0">
-          <NavItem href="/settings" icon={Settings} label="Settings" isActive={pathname.startsWith("/settings")} />
+          <NavItem href="/settings" icon={Settings} label="Settings & RBAC" isActive={pathname.startsWith("/settings")} />
         </div>
       </aside>
 
       {/* Main Content Area */}
       <main className="flex min-w-0 min-h-0 flex-1 flex-col bg-white relative z-10 shadow-[-10px_0_30px_rgba(0,0,0,0.02)] md:rounded-l-2xl border-l border-slate-200/50">
-        <header className="h-16 flex items-center justify-between px-6 border-b border-slate-100 bg-white shrink-0">
+        <header className="h-16 flex items-center justify-between px-6 border-b border-slate-100 bg-white shrink-0 relative z-30">
           <div className="flex items-center gap-4">
             <button className="md:hidden text-slate-500 hover:text-slate-900 transition-colors" onClick={() => setIsMobileMenuOpen(true)}>
               <Menu className="w-6 h-6" />
@@ -210,6 +370,7 @@ export function AppLayout({ children, rightSidebarContent, folders = [] }: AppLa
               />
             </div>
           </div>
+          
           <div className="flex items-center gap-3">
             <Link 
               href="/dashboard/repurpose" 
@@ -218,12 +379,289 @@ export function AppLayout({ children, rightSidebarContent, folders = [] }: AppLa
               <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
               Quick Atomizer
             </Link>
-            <button className="relative p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors" aria-label="Notifications">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border border-white"></span>
-            </button>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-white flex items-center justify-center font-bold text-xs shadow-sm ring-2 ring-white cursor-pointer hover:scale-105 transition-transform">
-              SC
+
+            {/* NOTIFICATIONS BELL & DROPDOWN */}
+            <div className="relative" ref={notificationsRef}>
+              <button 
+                onClick={() => {
+                  setIsNotificationsOpen(!isNotificationsOpen);
+                  setIsProfileOpen(false);
+                }}
+                className={cn(
+                  "relative p-2 rounded-full transition-colors",
+                  isNotificationsOpen ? "bg-indigo-50 text-indigo-600" : "text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                )} 
+                aria-label="Notifications"
+              >
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 min-w-4 h-4 px-1 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white animate-pulse">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Notifications Popover Drawer */}
+              {isNotificationsOpen && (
+                <div className="absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl bg-white border border-slate-200 shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="p-4 bg-slate-50 border-b border-slate-200/80 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="font-heading font-bold text-sm text-slate-900">Notifications</span>
+                      {unreadCount > 0 ? (
+                        <span className="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
+                          {unreadCount} new
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-semibold text-slate-400">All caught up</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {unreadCount > 0 && (
+                        <button 
+                          onClick={handleMarkAllRead}
+                          className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1"
+                        >
+                          <Check className="w-3 h-3" /> Mark read
+                        </button>
+                      )}
+                      <button 
+                        onClick={handleClearNotifications}
+                        title="Clear all"
+                        className="text-slate-400 hover:text-rose-600 transition-colors p-1"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Filter tabs */}
+                  <div className="flex items-center gap-1 p-2 border-b border-slate-100 bg-white text-xs overflow-x-auto">
+                    {[
+                      { id: "all", label: "All" },
+                      { id: "guardrails", label: "Alerts" },
+                      { id: "approvals", label: "Approvals" },
+                      { id: "system", label: "System" },
+                    ].map(tab => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveNotifTab(tab.id as typeof activeNotifTab)}
+                        className={cn(
+                          "px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors whitespace-nowrap",
+                          activeNotifTab === tab.id
+                            ? "bg-[#020617] text-white"
+                            : "text-slate-500 hover:bg-slate-100"
+                        )}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Notification List */}
+                  <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                    {filteredNotifications.length === 0 ? (
+                      <div className="p-8 text-center text-slate-400 space-y-1">
+                        <CheckCircle2 className="w-6 h-6 mx-auto text-emerald-500 mb-2" />
+                        <p className="text-xs font-semibold text-slate-600">No notifications here</p>
+                        <p className="text-[11px] text-slate-400">You are completely up to date.</p>
+                      </div>
+                    ) : (
+                      filteredNotifications.map(notif => (
+                        <div 
+                          key={notif.id}
+                          className={cn(
+                            "p-3.5 hover:bg-slate-50 transition-colors flex items-start justify-between gap-3 text-left group",
+                            !notif.read ? "bg-indigo-50/30" : "bg-white"
+                          )}
+                        >
+                          <div className="flex items-start gap-2.5 min-w-0">
+                            <div className="mt-0.5 shrink-0">
+                              {notif.category === "guardrails" && <AlertCircle className="w-4 h-4 text-amber-500" />}
+                              {notif.category === "approvals" && <ClipboardCheck className="w-4 h-4 text-indigo-600" />}
+                              {notif.category === "system" && <Sparkles className="w-4 h-4 text-emerald-500" />}
+                              {notif.category === "documents" && <FileText className="w-4 h-4 text-slate-500" />}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <p className={cn("text-xs leading-snug truncate", !notif.read ? "font-bold text-slate-900" : "font-semibold text-slate-700")}>
+                                  {notif.title}
+                                </p>
+                                {!notif.read && (
+                                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 shrink-0" />
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-500 line-clamp-2 mt-0.5 leading-relaxed">
+                                {notif.message}
+                              </p>
+                              <div className="flex items-center gap-2 mt-1.5 text-[10px] text-slate-400 font-medium">
+                                <span>{notif.time}</span>
+                                {notif.link && (
+                                  <Link 
+                                    href={notif.link}
+                                    onClick={() => {
+                                      handleMarkRead(notif.id);
+                                      setIsNotificationsOpen(false);
+                                    }}
+                                    className="text-indigo-600 hover:underline flex items-center gap-0.5 font-bold"
+                                  >
+                                    View <ExternalLink className="w-2.5 h-2.5" />
+                                  </Link>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {!notif.read && (
+                            <button
+                              onClick={(e) => handleMarkRead(notif.id, e)}
+                              title="Mark as read"
+                              className="text-slate-300 hover:text-indigo-600 p-1 shrink-0 transition-colors"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="p-2.5 bg-slate-50 border-t border-slate-100 text-center">
+                    <Link 
+                      href="/dashboard/activity" 
+                      onClick={() => setIsNotificationsOpen(false)}
+                      className="text-xs font-bold text-slate-600 hover:text-indigo-600 transition-colors"
+                    >
+                      View Full Activity Audit Trail →
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* USER PROFILE AVATAR & DROPDOWN */}
+            <div className="relative" ref={profileRef}>
+              <button 
+                onClick={() => {
+                  setIsProfileOpen(!isProfileOpen);
+                  setIsNotificationsOpen(false);
+                }}
+                className="flex items-center gap-2 p-1 rounded-full hover:ring-2 hover:ring-indigo-200 transition-all focus:outline-none"
+                aria-label="User Profile Menu"
+              >
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#020617] to-indigo-900 text-white flex items-center justify-center font-bold text-xs shadow-md border-2 border-white ring-1 ring-slate-200">
+                  {profile.name ? profile.name.split(" ").map(n => n[0]).join("").slice(0, 2) : "DG"}
+                </div>
+              </button>
+
+              {/* Profile Menu Popover */}
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-3 w-72 rounded-2xl bg-white border border-slate-200 shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                  {/* User Profile Card Header */}
+                  <div className="p-4 bg-slate-50 border-b border-slate-200/80">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[#020617] border border-[#1e293b] text-white flex items-center justify-center font-bold text-sm shadow-inner shrink-0">
+                        {profile.name ? profile.name.split(" ").map(n => n[0]).join("").slice(0, 2) : "DG"}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-heading font-bold text-sm text-slate-900 truncate">{profile.name}</p>
+                        <p className="text-[11px] text-slate-500 font-mono truncate">{profile.email}</p>
+                      </div>
+                    </div>
+                    <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Node 01 (US-East) · Enterprise</span>
+                    </div>
+                  </div>
+
+                  {/* Navigation Links */}
+                  <div className="p-2 space-y-0.5 text-xs font-semibold text-slate-700">
+                    <Link
+                      href="/settings?tab=profile"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-slate-900 transition-colors group"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <UserIcon className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                        Account Profile
+                      </span>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-600" />
+                    </Link>
+
+                    <Link
+                      href="/settings?tab=ai"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-slate-900 transition-colors group"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Sparkles className="w-4 h-4 text-indigo-500 group-hover:text-indigo-600 transition-colors" />
+                        AI Models & LPUs
+                      </span>
+                      <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">Groq 27B</span>
+                    </Link>
+
+                    <Link
+                      href="/settings?tab=team"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-slate-900 transition-colors group"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <ShieldCheck className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                        Team & RBAC
+                      </span>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-600" />
+                    </Link>
+
+                    <Link
+                      href="/settings?tab=billing"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-slate-900 transition-colors group"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <CreditCard className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                        Billing & Usage
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-500">85k tokens</span>
+                    </Link>
+
+                    <Link
+                      href="/settings?tab=integrations"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-slate-900 transition-colors group"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Key className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                        API Keys & Webhooks
+                      </span>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-600" />
+                    </Link>
+
+                    <Link
+                      href="/settings?tab=security"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-slate-900 transition-colors group"
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <Lock className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
+                        Security & Audit Logs
+                      </span>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-600" />
+                    </Link>
+                  </div>
+
+                  <div className="p-2 border-t border-slate-100 bg-slate-50">
+                    <button
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        addToast({ title: "Session Protected", message: "Switching workspace or signing out...", type: "info" });
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out / Switch Workspace
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </header>

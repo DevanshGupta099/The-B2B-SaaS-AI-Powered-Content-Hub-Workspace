@@ -50,6 +50,34 @@ export interface BackendActivityLog {
   time: string;
 }
 
+export interface BackendNotification {
+  id: string;
+  title: string;
+  message: string;
+  category: "approvals" | "guardrails" | "system" | "documents";
+  time: string;
+  read: boolean;
+  link?: string;
+}
+
+export interface BackendUserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  title: string;
+  bio: string;
+  timezone: string;
+  avatarUrl: string;
+  department: string;
+  notifications: {
+    emailOnApproval: boolean;
+    slackInstantPing: boolean;
+    weeklyAiSummary: boolean;
+    guardrailAlerts: boolean;
+  };
+}
+
 // Initial Backend Seed Data
 const seedWorkspaces: BackendWorkspace[] = [
   {
@@ -460,9 +488,111 @@ class BackendStore {
     this.activities.unshift(newAct);
     return newAct;
   }
+
+  // Profile
+  private profile: BackendUserProfile = {
+    id: "user-1",
+    name: "Devansh Gupta",
+    email: "devanshgupta091@gmail.com",
+    role: "Workspace Owner & Chief Architect",
+    title: "Principal Engineer",
+    bio: "Architecting governed multi-model content infrastructure with low-latency LPUs and dense semantic vector search.",
+    timezone: "Asia/Kolkata (IST, UTC+5:30)",
+    avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+    department: "Core Platform Architecture",
+    notifications: {
+      emailOnApproval: true,
+      slackInstantPing: true,
+      weeklyAiSummary: true,
+      guardrailAlerts: true
+    }
+  };
+
+  getProfile(): BackendUserProfile {
+    return this.profile;
+  }
+
+  updateProfile(updates: Partial<BackendUserProfile>): BackendUserProfile {
+    this.profile = {
+      ...this.profile,
+      ...updates,
+      notifications: {
+        ...this.profile.notifications,
+        ...(updates.notifications || {})
+      }
+    };
+    return this.profile;
+  }
+
+  // Notifications
+  private notifications: BackendNotification[] = [
+    {
+      id: "notif-1",
+      title: "Executive Report Synthesized",
+      message: "Q4 Content Velocity & Governance report generated via Groq Qwen 3.8-27b.",
+      category: "system",
+      time: "2 mins ago",
+      read: false,
+      link: "/dashboard"
+    },
+    {
+      id: "notif-2",
+      title: "Brand Voice Guardrail Triggered",
+      message: "Deterministic linter flagged prohibited term 'revolutionary' in draft.",
+      category: "guardrails",
+      time: "18 mins ago",
+      read: false,
+      link: "/dashboard/brand-kit"
+    },
+    {
+      id: "notif-3",
+      title: "Approval Requested: SOC2 Guide",
+      message: "Sarah Connor submitted 'SOC2 Compliance Migration Guide' for review.",
+      category: "approvals",
+      time: "1 hour ago",
+      read: false,
+      link: "/dashboard/approvals"
+    },
+    {
+      id: "notif-4",
+      title: "Project Apollo RFC Updated",
+      message: "New CRDT multiplayer architecture section added to document.",
+      category: "documents",
+      time: "3 hours ago",
+      read: true,
+      link: "/workspace/1"
+    }
+  ];
+
+  getNotifications(category?: string): BackendNotification[] {
+    if (category && category !== "all") {
+      return this.notifications.filter(n => n.category === category);
+    }
+    return this.notifications;
+  }
+
+  markNotificationRead(id: string): boolean {
+    const notif = this.notifications.find(n => n.id === id);
+    if (notif) {
+      notif.read = true;
+      return true;
+    }
+    return false;
+  }
+
+  markAllNotificationsRead(): void {
+    this.notifications.forEach(n => { n.read = true; });
+  }
+
+  clearNotifications(): void {
+    this.notifications = [];
+  }
 }
 
 // Global singleton to survive Next.js module reloads in dev
 const globalForStore = globalThis as unknown as { backendStore?: BackendStore };
-export const serverStore = globalForStore.backendStore ?? new BackendStore();
+export const serverStore = (globalForStore.backendStore && typeof globalForStore.backendStore.getProfile === "function")
+  ? globalForStore.backendStore
+  : new BackendStore();
 if (process.env.NODE_ENV !== "production") globalForStore.backendStore = serverStore;
+

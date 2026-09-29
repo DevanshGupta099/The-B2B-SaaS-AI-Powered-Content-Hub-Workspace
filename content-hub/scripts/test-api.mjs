@@ -111,6 +111,25 @@ async function runTests() {
     focusArea: "Enterprise Q4 Content Throughput & Governance"
   });
 
+  // 14. User Profile & Preferences
+  await testEndpoint("User Profile Management (GET)", "/api/profile");
+  await testEndpoint("User Profile Update (PUT)", "/api/profile", "PUT", {
+    name: "Devansh Gupta",
+    role: "Workspace Owner & Chief Architect",
+    title: "Principal Engineer"
+  });
+
+  // 15. Notifications Center
+  await testEndpoint("Notifications Center (GET)", "/api/notifications");
+  await testEndpoint("Notifications Read Flag (PATCH)", "/api/notifications", "PATCH", {
+    id: "notif-2"
+  });
+
+  // 16. Python NLP & Linguistic Intelligence Audit
+  await testEndpoint("Python 3.14 NLP & Readability Engine", "/api/ai/nlp-audit", "POST", {
+    text: "Nexus Content OS delivers deterministic governance and low-latency inference orchestration."
+  });
+
   console.log("==================================================");
   console.log(`Results: ${passed} / ${total} Endpoints Passed (${Math.round((passed / total) * 100)}%)`);
   console.log("==================================================");
@@ -123,3 +142,4 @@ async function runTests() {
 }
 
 runTests();
+

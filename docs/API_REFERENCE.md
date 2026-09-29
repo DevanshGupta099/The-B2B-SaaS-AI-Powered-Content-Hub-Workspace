@@ -155,3 +155,34 @@ Deletes a media asset by ID.
 
 ### `POST /api/report`
 Synthesizes an executive workspace intelligence report using Groq LPUs.
+
+---
+
+## 3. User Identity, Notifications & Python NLP Services
+
+### `GET /api/profile`
+Retrieves current user identity, role, department, timezone, and notification preferences.
+
+### `PUT /api/profile`
+Updates user profile settings and logs change in immutable audit trail.
+
+### `GET /api/notifications`
+Returns active alerts with unread counter. Supports `?category=approvals|guardrails|system|documents`.
+
+### `PATCH /api/notifications`
+Marks single notification as read (`{ "id": "notif-1" }`).
+
+### `POST /api/notifications`
+Batch actions such as `{ "action": "mark_all_read" }`.
+
+### `DELETE /api/notifications`
+Clears notification center.
+
+### `POST /api/ai/nlp-audit`
+Executes the **Python 3.14 ContentIntelligenceEngine** (`services/nlp_engine.py`) to compute:
+- Flesch Reading Ease & Flesch-Kincaid Grade Level
+- Gunning Fog Index
+- Lexical Type-Token Ratio & complexity index
+- Deterministic buzzword detection
+- Executive Tone Index and passive voice frequency
+

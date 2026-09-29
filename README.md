@@ -11,6 +11,7 @@
 [![Hugging Face](https://img.shields.io/badge/Hugging%20Face-BAAI%20bge--small-yellow?style=for-the-badge&logo=huggingface)](https://huggingface.co/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-success?style=for-the-badge&logo=vercel)](https://the-b2-b-saa-s-ai-powered-content-h.vercel.app/)
 [![Tests](https://img.shields.io/badge/API%20Tests-100%25%20Passing-emerald?style=for-the-badge&logo=checkmarx)](https://github.com/DevanshGupta099/The-B2B-SaaS-AI-Powered-Content-Hub-Workspace)
 
 </div>

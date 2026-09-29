@@ -22,10 +22,9 @@ import { createDocument } from "@/lib/documents";
 
 const models = [
   { id: "qwen/qwen3.8-27b", name: "Groq Qwen 3.8 27B", speed: "18ms", provider: "Groq", tag: "Fast & Active" },
+  { id: "llama-3.3-70b-versatile", name: "Groq Llama 3.3 70B", speed: "220ms", provider: "Groq", tag: "Deep Reasoning" },
+  { id: "llama-3.1-8b-instant", name: "Groq Llama 3.1 8B", speed: "12ms", provider: "Groq", tag: "Instant" },
   { id: "llama3.2:3b", name: "Ollama Llama 3.2 3B", speed: "45ms", provider: "Ollama", tag: "Local Private" },
-  { id: "claude-3-7", name: "Claude 3.7 Sonnet", speed: "180ms", provider: "Anthropic", tag: "Best for Long-Form" },
-  { id: "gpt-4o", name: "GPT-4o Omnichannel", speed: "160ms", provider: "OpenAI", tag: "Multimodal" },
-  { id: "deepseek-r1", name: "DeepSeek R1", speed: "210ms", provider: "DeepSeek", tag: "Deep Reasoning" },
 ];
 
 const recipes = [
@@ -57,7 +56,7 @@ const recipes = [
 
 const mockVersions = [
   { version: "v1.3 (Current)", author: "Devansh (You)", timestamp: "Just now", diff: "+ AI Generated real-time section using Groq Qwen 3.8-27b" },
-  { version: "v1.2", author: "Claude 3.7 Copilot", timestamp: "15 mins ago", diff: "+ Expanded technical architecture section" },
+  { version: "v1.2", author: "Groq LPU Copilot", timestamp: "15 mins ago", diff: "+ Expanded technical architecture section" },
   { version: "v1.1", author: "Sarah Connor (Reviewer)", timestamp: "1 hour ago", diff: "~ Rephrased enterprise compliance disclaimer" },
   { version: "v1.0 (Initial)", author: "Devansh", timestamp: "3 hours ago", diff: "Initial draft generated from RFC spec" }
 ];

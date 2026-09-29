@@ -79,7 +79,7 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
     },
     {
       title: "AI Studio & Copilot",
-      desc: "Block document editor with Claude 3.7 & GPT-4o",
+      desc: "Block document editor with sub-second Groq LPUs",
       icon: Bot,
       href: "/dashboard/ai-studio",
       badge: "New",
@@ -172,7 +172,7 @@ export function MarketingShell({ children }: { children: React.ReactNode }) {
       desc: "Real-time edge telemetry and latency reports",
       href: "/status",
       icon: Activity,
-      badge: "99.99%"
+      badge: "Live"
     },
     {
       title: "Security & Trust Center",

@@ -100,7 +100,7 @@ const featureModules = [
     icon: Cpu,
     stats: "Multi-Model Switching",
     href: "/dashboard/agents",
-    bullets: ["Claude 3.7, GPT-4o, Gemini 2.0 Pro backends", "Custom system instructions & temperature sliders", "Reusable recipe prompt blueprints"]
+    bullets: ["Groq Qwen 3.8-27B & Llama 3.3-70B LPUs", "Custom system instructions & temperature sliders", "Reusable recipe prompt blueprints"]
   },
   {
     id: "publish",
@@ -292,7 +292,7 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="flex items-center gap-3 text-xs">
-                  <span className="text-slate-400">Model: <strong>Claude 3.7 Sonnet</strong></span>
+                  <span className="text-slate-400">Model: <strong>Groq Qwen 3.8 27B (LPU)</strong></span>
                   <span className="text-emerald-400 font-bold flex items-center gap-1 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 98.4% Brand Alignment
                   </span>

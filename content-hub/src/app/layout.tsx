@@ -25,7 +25,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://nexus-content-hub.vercel.app"),
+  metadataBase: new URL("https://the-b2-b-saa-s-ai-powered-content-h.vercel.app"),
   title: {
     default: "Nexus - Governed B2B AI Content OS & Workspace",
     template: "%s | Nexus Content OS",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Nexus - Governed B2B AI Content OS & Workspace",
     description: "Enterprise AI-powered content hub for planning, generating, brand-checking, and distributing multi-channel content at scale.",
-    url: "https://nexus-content-hub.vercel.app",
+    url: "https://the-b2-b-saa-s-ai-powered-content-h.vercel.app",
     siteName: "Nexus Content OS",
     locale: "en_US",
     type: "website",
