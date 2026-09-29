@@ -51,15 +51,19 @@ export default function SignupPage() {
         className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 sm:p-10 shadow-xl"
       >
         <div className="flex items-center justify-between mb-8">
-          <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-heading font-bold text-base shadow-xs">
+          <Link href="/" className="inline-flex items-center gap-2.5 group">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-heading font-bold text-base shadow-xs group-hover:scale-105 transition-transform">
               N
             </div>
             <span className="font-heading text-xl font-bold text-slate-900 tracking-tight">Nexus</span>
           </Link>
-          <span className="text-[11px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">
-            Enterprise Tier
-          </span>
+          <Link 
+            href="/" 
+            className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-indigo-600 transition-colors group"
+          >
+            <span>Landing Page</span>
+            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+          </Link>
         </div>
 
         <h1 className="font-heading text-3xl font-bold text-slate-900">Start your workspace</h1>

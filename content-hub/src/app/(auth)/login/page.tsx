@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import Image from "next/image";
 import { Avatar } from "@/components/ui/Avatar";
-import { AlertCircle, Lock, Mail, ArrowRight } from "lucide-react";
+import { AlertCircle, Lock, Mail, ArrowRight, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -104,6 +104,20 @@ export default function LoginPage() {
             </Link>
           </div>
           
+          {/* Back to Landing Page Navigation */}
+          <div className="mb-6 flex items-center justify-between">
+            <Link 
+              href="/" 
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-indigo-600 transition-colors group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+              <span>Back to Landing Page</span>
+            </Link>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              Public Portal
+            </span>
+          </div>
+
           <div className="mb-6">
             <h2 className="font-heading text-3xl font-bold text-slate-900 mb-1.5">Sign in to Nexus</h2>
             <p className="text-slate-500 text-sm">Credentials validated against secure backend authentication store.</p>
