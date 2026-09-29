@@ -7,5 +7,9 @@
     "build": "npm --prefix content-hub run build",
     "start": "npm --prefix content-hub run start",
     "lint": "npm --prefix content-hub run lint"
+  },
+  "allowScripts": {
+    "sharp": true,
+    "unrs-resolver": true
   }
 }
