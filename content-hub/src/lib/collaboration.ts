@@ -69,7 +69,7 @@ export const realtimeEngine = {
           id: "sarah",
           name: "Sarah Connor",
           role: "Admin",
-          avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+          avatarUrl: `https://api.dicebear.com/7.x/lorelei/svg?seed=sarah&backgroundColor=b6e3f4,c0aede`,
           color: "#4f46e5",
           cursor: { x: 140, y: 220 },
           lastActive: Date.now()
@@ -78,7 +78,7 @@ export const realtimeEngine = {
           id: "devansh",
           name: "Devansh",
           role: "Admin",
-          avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+          avatarUrl: `https://api.dicebear.com/7.x/bottts/svg?seed=devansh&backgroundColor=d1d4f9,ffdfbf`,
           color: "#7c3aed",
           cursor: { x: 380, y: 310 },
           lastActive: Date.now()

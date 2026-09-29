@@ -30,9 +30,12 @@ const folders: WorkspaceFolder[] = [
   { id: "engineering", name: "Engineering", files: [{ id: "architecture-rfc", name: "Architecture RFC" }, { id: "api-docs", name: "API Documentation" }] },
 ];
 
+import { getAvatarUrl } from "@/lib/avatar";
+import { sanitizeHtml } from "@/lib/sanitize";
+
 const collaborators: User[] = [
-  { id: "sarah", name: "Sarah Connor", role: "Admin", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" },
-  { id: "devansh", name: "Devansh", role: "Admin", avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80" },
+  { id: "sarah", name: "Sarah Connor", role: "Admin", avatarUrl: getAvatarUrl("Sarah Connor", "lorelei") },
+  { id: "devansh", name: "Devansh", role: "Admin", avatarUrl: getAvatarUrl("Devansh", "bottts") },
 ];
 
 interface Comment { id: string; author: string; message: string; time: string; }
@@ -452,9 +455,9 @@ export default function WorkspacePage() {
                 key={workspaceDocument.id} 
                 contentEditable 
                 suppressContentEditableWarning 
-                onBlur={(event) => persist({ content: event.currentTarget.innerHTML })} 
+                onBlur={(event) => persist({ content: sanitizeHtml(event.currentTarget.innerHTML) })} 
                 className="min-h-[260px] rounded-2xl outline-none focus:ring-2 focus:ring-indigo-200 p-2" 
-                dangerouslySetInnerHTML={{ __html: workspaceDocument.content }} 
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(workspaceDocument.content) }} 
               />
               <div className="my-10">
                 <AiVisionBlock />

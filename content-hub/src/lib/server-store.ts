@@ -98,9 +98,9 @@ const seedWorkspaces: BackendWorkspace[] = [
     membersCount: 8,
     color: "bg-indigo-600",
     users: [
-      { id: "u1", name: "Sarah Connor", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" },
-      { id: "u2", name: "Devansh", avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80" },
-      { id: "u3", name: "David Kim", avatarUrl: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80" }
+      { id: "u1", name: "Sarah Connor", avatarUrl: "https://api.dicebear.com/7.x/lorelei/svg?seed=sarah&backgroundColor=b6e3f4,c0aede" },
+      { id: "u2", name: "Devansh", avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=devansh&backgroundColor=d1d4f9,ffdfbf" },
+      { id: "u3", name: "David Kim", avatarUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=david&backgroundColor=c0aede,d1d4f9" }
     ],
     tags: ["Infrastructure", "Groq LPUs", "RFC"],
     createdAt: "Aug 15, 2026"
@@ -113,8 +113,8 @@ const seedWorkspaces: BackendWorkspace[] = [
     membersCount: 5,
     color: "bg-violet-600",
     users: [
-      { id: "u4", name: "Michael Scott", avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80" },
-      { id: "u1", name: "Sarah Connor", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" }
+      { id: "u4", name: "Michael Scott", avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=michael&backgroundColor=ffd5dc,b6e3f4" },
+      { id: "u1", name: "Sarah Connor", avatarUrl: "https://api.dicebear.com/7.x/lorelei/svg?seed=sarah&backgroundColor=b6e3f4,c0aede" }
     ],
     tags: ["Branding", "Voice Linters", "Guidelines"],
     createdAt: "Aug 20, 2026"
@@ -127,8 +127,8 @@ const seedWorkspaces: BackendWorkspace[] = [
     membersCount: 6,
     color: "bg-emerald-600",
     users: [
-      { id: "u2", name: "Devansh", avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80" },
-      { id: "u3", name: "David Kim", avatarUrl: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80" }
+      { id: "u2", name: "Devansh", avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=devansh&backgroundColor=d1d4f9,ffdfbf" },
+      { id: "u3", name: "David Kim", avatarUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=david&backgroundColor=c0aede,d1d4f9" }
     ],
     tags: ["Strategy", "OKRs", "Product"],
     createdAt: "Sep 01, 2026"
@@ -141,8 +141,8 @@ const seedWorkspaces: BackendWorkspace[] = [
     membersCount: 6,
     color: "bg-violet-500",
     users: [
-      { id: "u1", name: "Sarah Connor", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" },
-      { id: "u4", name: "Michael Scott", avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80" }
+      { id: "u1", name: "Sarah Connor", avatarUrl: "https://api.dicebear.com/7.x/lorelei/svg?seed=sarah&backgroundColor=b6e3f4,c0aede" },
+      { id: "u4", name: "Michael Scott", avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=michael&backgroundColor=ffd5dc,b6e3f4" }
     ],
     tags: ["GTM", "Campaigns"],
     createdAt: "Jul 10, 2026"
@@ -155,8 +155,8 @@ const seedWorkspaces: BackendWorkspace[] = [
     membersCount: 9,
     color: "bg-sky-500",
     users: [
-      { id: "u2", name: "Devansh", avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80" },
-      { id: "u3", name: "David Kim", avatarUrl: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80" }
+      { id: "u2", name: "Devansh", avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=devansh&backgroundColor=d1d4f9,ffdfbf" },
+      { id: "u3", name: "David Kim", avatarUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=david&backgroundColor=c0aede,d1d4f9" }
     ],
     tags: ["Architecture", "APIs"],
     createdAt: "Jul 12, 2026"
@@ -169,7 +169,7 @@ const seedWorkspaces: BackendWorkspace[] = [
     membersCount: 4,
     color: "bg-emerald-500",
     users: [
-      { id: "u2", name: "Devansh", avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80" }
+      { id: "u2", name: "Devansh", avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=devansh&backgroundColor=d1d4f9,ffdfbf" }
     ],
     tags: ["Revenue", "Budget"],
     createdAt: "Aug 01, 2026"
@@ -182,7 +182,7 @@ const seedWorkspaces: BackendWorkspace[] = [
     membersCount: 7,
     color: "bg-amber-500",
     users: [
-      { id: "u1", name: "Sarah Connor", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" }
+      { id: "u1", name: "Sarah Connor", avatarUrl: "https://api.dicebear.com/7.x/lorelei/svg?seed=sarah&backgroundColor=b6e3f4,c0aede" }
     ],
     tags: ["Backlog", "Specs"],
     createdAt: "Aug 05, 2026"
@@ -197,7 +197,7 @@ const seedDocuments: BackendDocument[] = [
     workspace: "Marketing",
     updatedAt: "2 mins ago",
     author: "Sarah Connor",
-    authorAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+    authorAvatar: "https://api.dicebear.com/7.x/lorelei/svg?seed=sarah&backgroundColor=b6e3f4,c0aede",
     content: "<h2>1. Executive Summary</h2><p>In Q4, Nexus will accelerate multi-channel B2B distribution by positioning our Governed AI Content OS directly against fragmented point solutions. Our target is generating 450 enterprise qualified pipeline opportunities.</p><h2>2. Value Proposition & Moat</h2><p>Unlike consumer AI wrappers, Nexus provides deterministic brand linters, zero data retention agreements, and atomic 1-to-many syndication directly to CMS backends.</p>",
     tags: ["Strategy", "Q4", "Enterprise"],
     status: "In Review"
@@ -209,7 +209,7 @@ const seedDocuments: BackendDocument[] = [
     workspace: "Engineering",
     updatedAt: "15 mins ago",
     author: "Devansh",
-    authorAvatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+    authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=devansh&backgroundColor=d1d4f9,ffdfbf",
     content: "<h2>1. Motivation</h2><p>To eliminate sub-optimal latency and support concurrent collaborative document authoring, Project Apollo replaces legacy state sync with deterministic CRDT models and edge-accelerated Groq inference pipelines.</p><h2>2. Technical Architecture</h2><p>All AI requests route through our adaptive token rate governor to ensure 100% SLA compliance even under sudden traffic bursts.</p>",
     tags: ["Infrastructure", "Apollo", "Architecture"],
     status: "Approved"
@@ -221,7 +221,7 @@ const seedDocuments: BackendDocument[] = [
     workspace: "Marketing",
     updatedAt: "1 hour ago",
     author: "Michael Scott",
-    authorAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
+    authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=michael&backgroundColor=ffd5dc,b6e3f4",
     content: "<h2>Brand Voice Tenets</h2><p>1. <strong>Direct & Factual:</strong> Avoid inflated marketing superlatives like 'revolutionary' or 'best-in-class'. State verifiable benchmark metrics.</p><p>2. <strong>Enterprise Rigor:</strong> Speak to VP of Content and Head of Legal buyers with clarity, security posture, and precision.</p>",
     tags: ["Branding", "Voice Guidelines"],
     status: "Published"
@@ -233,7 +233,7 @@ const seedDocuments: BackendDocument[] = [
     workspace: "Product",
     updatedAt: "2 hours ago",
     author: "David Kim",
-    authorAvatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80",
+    authorAvatar: "https://api.dicebear.com/7.x/shapes/svg?seed=david&backgroundColor=c0aede,d1d4f9",
     content: "<h2>Objective 1: Multi-Model Inference Velocity</h2><p>KR1: Maintain p95 chat completion latency under 350ms across all global endpoints.</p><p>KR2: Deploy 384-dimensional dense semantic RAG across all workspace DAM repositories.</p>",
     tags: ["Roadmap", "OKRs", "Product"],
     status: "Draft"
@@ -245,7 +245,7 @@ const seedDocuments: BackendDocument[] = [
     workspace: "Engineering",
     updatedAt: "3 hours ago",
     author: "Devansh",
-    authorAvatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+    authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=devansh&backgroundColor=d1d4f9,ffdfbf",
     content: "<h2>REST API Authentication</h2><p>Every inbound API request must supply the <code>Authorization: Bearer nx_live_...</code> header generated from Workspace Administration.</p>",
     tags: ["API", "Webhooks"],
     status: "Published"
@@ -257,7 +257,7 @@ const seedDocuments: BackendDocument[] = [
     workspace: "Engineering",
     updatedAt: "1 day ago",
     author: "Sarah Connor",
-    authorAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+    authorAvatar: "https://api.dicebear.com/7.x/lorelei/svg?seed=sarah&backgroundColor=b6e3f4,c0aede",
     content: "<h2>Event Bus Specification</h2><p>All content atomization and editorial approvals publish asynchronous events via idempotency-guaranteed event streaming queues.</p>",
     tags: ["Architecture", "Event Bus"],
     status: "Approved"
@@ -269,7 +269,7 @@ const seedDocuments: BackendDocument[] = [
     workspace: "Marketing",
     updatedAt: "2 days ago",
     author: "Michael Scott",
-    authorAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
+    authorAvatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=michael&backgroundColor=ffd5dc,b6e3f4",
     content: "<h2>Editorial Standards</h2><p>Guidelines for external publications, press releases, technical whitepapers, and customer case studies.</p>",
     tags: ["Editorial", "Guidelines"],
     status: "Published"
@@ -281,7 +281,7 @@ const seedDocuments: BackendDocument[] = [
     workspace: "Finance",
     updatedAt: "3 days ago",
     author: "Devansh",
-    authorAvatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+    authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=devansh&backgroundColor=d1d4f9,ffdfbf",
     content: "<h2>Financial Performance</h2><p>ARR expanded by 34% quarter-over-quarter. Blended gross margin reached 82% due to low-latency Groq hardware cost efficiency.</p>",
     tags: ["Financials", "Margins"],
     status: "Approved"
@@ -345,7 +345,7 @@ const seedActivityLogs: BackendActivityLog[] = [
     user: "Sarah Connor",
     action: "edited",
     document: "Q4 Marketing Strategy",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+    avatar: "https://api.dicebear.com/7.x/lorelei/svg?seed=sarah&backgroundColor=b6e3f4,c0aede",
     time: "2 mins ago"
   },
   {
@@ -353,7 +353,7 @@ const seedActivityLogs: BackendActivityLog[] = [
     user: "Devansh",
     action: "commented on",
     document: "Project Apollo RFC",
-    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=devansh&backgroundColor=d1d4f9,ffdfbf",
     time: "1 hour ago"
   },
   {
@@ -361,7 +361,7 @@ const seedActivityLogs: BackendActivityLog[] = [
     user: "Michael Scott",
     action: "approved",
     document: "Nexus Brand Identity v2.4",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=michael&backgroundColor=ffd5dc,b6e3f4",
     time: "3 hours ago"
   }
 ];
@@ -426,7 +426,7 @@ class BackendStore {
         workspace: (["Marketing", "Engineering", "Finance", "Product"].includes(ws.name) ? ws.name : "Marketing") as BackendDocument["workspace"],
         updatedAt: "Just now",
         author: "Devansh",
-        authorAvatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+        authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=devansh&backgroundColor=d1d4f9,ffdfbf",
         content: `<h2>Welcome to ${ws.name}</h2><p>${ws.desc}</p><p>Start drafting your team's content here, or use the Nexus AI Copilot on the right to kick off your first draft.</p>`,
         status: "Draft",
         tags: ws.tags
@@ -508,7 +508,7 @@ class BackendStore {
     title: "Principal Engineer",
     bio: "Architecting governed multi-model content infrastructure with low-latency LPUs and dense semantic vector search.",
     timezone: "Asia/Kolkata (IST, UTC+5:30)",
-    avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+    avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=devansh&backgroundColor=d1d4f9,ffdfbf",
     department: "Core Platform Architecture",
     notifications: {
       emailOnApproval: true,
@@ -652,7 +652,7 @@ class BackendStore {
       user: newUser.name,
       action: "created workspace account",
       document: newUser.workspaceName || "New Workspace",
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"
+      avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=devansh&backgroundColor=d1d4f9,ffdfbf"
     });
 
     const safeUser: Omit<BackendUser, "password"> = {

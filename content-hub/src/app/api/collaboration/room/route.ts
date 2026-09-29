@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { realtimeEngine } from "@/lib/collaboration";
+import { getAvatarUrl } from "@/lib/avatar";
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
       id: user.id,
       name: user.name || "Collaborator",
       role: user.role || "Editor",
-      avatarUrl: user.avatarUrl || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      avatarUrl: user.avatarUrl || getAvatarUrl(user.name || "Collaborator", "bottts"),
       cursor
     });
 

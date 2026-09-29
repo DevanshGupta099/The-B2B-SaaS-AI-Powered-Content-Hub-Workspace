@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 export interface CursorPosition {
   id: string;
@@ -74,7 +75,7 @@ export function EditorCanvas({ title = "Untitled", initialHtml = "", cursors = [
             contentEditable 
             suppressContentEditableWarning 
             className="min-h-[300px] outline-none"
-            dangerouslySetInnerHTML={{ __html: initialHtml || "<p>Start typing...</p>" }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(initialHtml || "<p>Start typing...</p>") }}
           />
         </div>
       </div>

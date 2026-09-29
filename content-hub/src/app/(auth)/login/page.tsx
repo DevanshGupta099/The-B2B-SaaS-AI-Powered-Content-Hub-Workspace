@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import Image from "next/image";
+import { Avatar } from "@/components/ui/Avatar";
 import { AlertCircle, Lock, Mail, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -81,9 +82,9 @@ export default function LoginPage() {
           
           <div className="mt-10 flex items-center gap-4 text-sm font-medium text-slate-400">
             <div className="flex -space-x-2">
-              <Image src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" alt="Sarah" width={36} height={36} className="w-9 h-9 rounded-full border-2 border-slate-900 object-cover" />
-              <Image src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80" alt="Devansh" width={36} height={36} className="w-9 h-9 rounded-full border-2 border-slate-900 object-cover" />
-              <Image src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80" alt="Michael" width={36} height={36} className="w-9 h-9 rounded-full border-2 border-slate-900 object-cover" />
+              <Avatar name="Sarah Connor" style="lorelei" size={36} className="w-9 h-9 border-2 border-slate-900" />
+              <Avatar name="Devansh Gupta" style="bottts" size={36} className="w-9 h-9 border-2 border-slate-900" />
+              <Avatar name="Michael Scott" style="avataaars" size={36} className="w-9 h-9 border-2 border-slate-900" />
             </div>
             <p className="text-xs">Active sessions authenticated via backend store</p>
           </div>

@@ -27,6 +27,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/ToastNotifications";
+import { Avatar } from "@/components/ui/Avatar";
+import { getAvatarUrl, AvatarStyle } from "@/lib/avatar";
 
 type SettingsTab = "ai" | "profile" | "team" | "billing" | "integrations" | "security";
 
@@ -105,7 +107,7 @@ function SettingsContent() {
     title: "Principal Engineer",
     bio: "Architecting governed multi-model content infrastructure with low-latency LPUs and dense semantic vector search.",
     timezone: "Asia/Kolkata (IST, UTC+5:30)",
-    avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+    avatarUrl: getAvatarUrl("Devansh Gupta", "bottts"),
     department: "Core Platform Architecture",
     notifications: {
       emailOnApproval: true,
@@ -471,38 +473,38 @@ function SettingsContent() {
 
                 {/* Avatar Preview & Selection */}
                 <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center gap-5">
-                  <div className="w-20 h-20 rounded-full bg-[#020617] border-4 border-white shadow-lg overflow-hidden flex items-center justify-center shrink-0">
-                    {profile.avatarUrl ? (
-                      <img src={profile.avatarUrl} alt={profile.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-white text-2xl font-bold font-heading">
-                        {profile.name.slice(0, 2).toUpperCase()}
-                      </span>
-                    )}
-                  </div>
+                  <Avatar 
+                    src={profile.avatarUrl} 
+                    name={profile.name} 
+                    size={72} 
+                    className="w-18 h-18 rounded-full border-4 border-white shadow-lg overflow-hidden shrink-0" 
+                  />
                   <div className="flex-1 space-y-2 text-center sm:text-left">
                     <div>
                       <h3 className="font-heading font-bold text-slate-900 text-sm">{profile.name}</h3>
                       <p className="text-xs text-indigo-600 font-medium">{profile.role}</p>
                     </div>
-                    <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                      {[
-                        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
-                        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
-                        "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80",
-                        "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80"
-                      ].map((url, i) => (
-                        <button
-                          key={i}
-                          type="button"
-                          onClick={() => setProfile({ ...profile, avatarUrl: url })}
-                          className={`w-9 h-9 rounded-full border-2 overflow-hidden hover:scale-105 transition-transform ${
-                            profile.avatarUrl === url ? "border-indigo-600 ring-2 ring-indigo-300" : "border-slate-200"
-                          }`}
-                        >
-                          <img src={url} alt={`Avatar ${i}`} className="w-full h-full object-cover" />
-                        </button>
-                      ))}
+                    <div>
+                      <span className="text-[11px] font-semibold text-slate-500 block mb-1.5">Choose Vector Avatar Style</span>
+                      <div className="flex flex-wrap gap-2.5 justify-center sm:justify-start">
+                        {(["bottts", "lorelei", "avataaars", "shapes", "fun-emoji", "thumbs"] as AvatarStyle[]).map((styleKey) => {
+                          const url = getAvatarUrl(profile.name || "user", styleKey);
+                          const isSelected = profile.avatarUrl === url || (!profile.avatarUrl && styleKey === "bottts");
+                          return (
+                            <button
+                              key={styleKey}
+                              type="button"
+                              onClick={() => setProfile({ ...profile, avatarUrl: url })}
+                              title={styleKey}
+                              className={`p-0.5 rounded-full border-2 transition-all hover:scale-110 ${
+                                isSelected ? "border-indigo-600 ring-2 ring-indigo-300 scale-105" : "border-slate-200"
+                              }`}
+                            >
+                              <Avatar src={url} name={styleKey} size={36} className="w-9 h-9" />
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { serverStore, BackendDocument } from "@/lib/server-store";
+import { getAvatarUrl } from "@/lib/avatar";
 
 export async function GET(req: Request) {
   try {
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
       workspaceId: workspaceId || "marketing",
       workspace: (workspace || "Marketing") as BackendDocument["workspace"],
       author: "Devansh",
-      authorAvatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      authorAvatar: getAvatarUrl("Devansh", "bottts"),
       content: content || "<p>Start writing, or ask Nexus AI Copilot to draft sections for you.</p>",
       tags: Array.isArray(tags) ? tags : ["General"],
       status: "Draft"
@@ -47,7 +48,7 @@ export async function POST(req: Request) {
       user: "Devansh",
       action: "created document",
       document: created.title,
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"
+      avatar: getAvatarUrl("Devansh", "bottts")
     });
 
     return NextResponse.json({ document: created }, { status: 201 });

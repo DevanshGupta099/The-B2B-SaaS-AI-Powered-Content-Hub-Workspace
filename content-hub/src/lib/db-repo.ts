@@ -1,5 +1,6 @@
 import { sql, isDatabaseConfigured } from "./db";
 import { BackendUser, BackendWorkspace, BackendDocument, BackendMediaAsset, BackendActivityLog } from "./server-store";
+import { getAvatarUrl } from "./avatar";
 
 export interface DBUserRow {
   id: string;
@@ -77,7 +78,7 @@ export const dbRepo = {
           ${user.password}, 
           ${user.role}, 
           ${user.workspaceName || null}, 
-          ${"https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"}, 
+          ${`https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user.name)}&backgroundColor=d1d4f9,ffdfbf`}, 
           ${user.createdAt}
         )
         ON CONFLICT (email) DO UPDATE 
@@ -110,8 +111,8 @@ export const dbRepo = {
         membersCount: 4,
         color: "bg-indigo-600",
         users: [
-          { id: "u1", name: "Devansh", avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80" },
-          { id: "u2", name: "Sarah", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" }
+          { id: "u1", name: "Devansh", avatarUrl: getAvatarUrl("Devansh", "bottts") },
+          { id: "u2", name: "Sarah", avatarUrl: getAvatarUrl("Sarah", "lorelei") }
         ],
         tags: ["Production", "AI Governance"],
         createdAt: r.created_at
@@ -185,7 +186,7 @@ export const dbRepo = {
           ${user}, 
           ${action}, 
           ${document}, 
-          ${avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"}, 
+          ${avatar || getAvatarUrl(user, "bottts")}, 
           NOW()
         );
       `;

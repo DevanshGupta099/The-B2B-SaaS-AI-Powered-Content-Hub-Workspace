@@ -17,6 +17,8 @@ import {
   Cpu
 } from "lucide-react";
 import { AvatarGroup } from "@/components/ui/AvatarGroup";
+import { Avatar } from "@/components/ui/Avatar";
+import { getAvatarUrl } from "@/lib/avatar";
 import Image from "next/image";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
@@ -51,9 +53,9 @@ interface ExecutiveReportData {
 export default function DashboardPage() {
   const { addToast } = useToast();
   const [workspaces, setWorkspaces] = useState<WorkspaceItem[]>([
-    { id: "1", name: "Project Apollo", desc: "Core infrastructure rewrite & AI engine integration", docsCount: 15, users: [{id: "u1", name: "Sarah Connor", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80"}, {id: "u2", name: "Devansh", avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"}] },
-    { id: "2", name: "Brand Refresh", desc: "Marketing assets, design tokens, and voice governance", docsCount: 8, users: [{id: "u3", name: "Michael Scott", avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80"}] },
-    { id: "3", name: "Q4 Roadmap", desc: "Enterprise compliance, autonomous agents, and RAG search", docsCount: 3, users: [{id: "u1", name: "Sarah Connor", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80"}, {id: "u2", name: "Devansh", avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"}] },
+    { id: "1", name: "Project Apollo", desc: "Core infrastructure rewrite & AI engine integration", docsCount: 15, users: [{id: "u1", name: "Sarah Connor", avatarUrl: getAvatarUrl("Sarah Connor", "lorelei")}, {id: "u2", name: "Devansh", avatarUrl: getAvatarUrl("Devansh", "bottts")}] },
+    { id: "2", name: "Brand Refresh", desc: "Marketing assets, design tokens, and voice governance", docsCount: 8, users: [{id: "u3", name: "Michael Scott", avatarUrl: getAvatarUrl("Michael Scott", "avataaars")}] },
+    { id: "3", name: "Q4 Roadmap", desc: "Enterprise compliance, autonomous agents, and RAG search", docsCount: 3, users: [{id: "u1", name: "Sarah Connor", avatarUrl: getAvatarUrl("Sarah Connor", "lorelei")}, {id: "u2", name: "Devansh", avatarUrl: getAvatarUrl("Devansh", "bottts")}] },
   ]);
 
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
@@ -154,9 +156,9 @@ export default function DashboardPage() {
   ];
 
   const recentActivity = [
-    { id: 1, user: "Sarah Connor", action: "edited", document: "Q4 Marketing Strategy", time: "2 mins ago", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" },
-    { id: 2, user: "Devansh", action: "commented on", document: "Project Apollo RFC", time: "1 hour ago", avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80" },
-    { id: 3, user: "Michael Scott", action: "approved", document: "Nexus Brand Identity v2.4", time: "3 hours ago", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80" },
+    { id: 1, user: "Sarah Connor", action: "edited", document: "Q4 Marketing Strategy", time: "2 mins ago", avatar: getAvatarUrl("Sarah Connor", "lorelei") },
+    { id: 2, user: "Devansh", action: "commented on", document: "Project Apollo RFC", time: "1 hour ago", avatar: getAvatarUrl("Devansh", "bottts") },
+    { id: 3, user: "Michael Scott", action: "approved", document: "Nexus Brand Identity v2.4", time: "3 hours ago", avatar: getAvatarUrl("Michael Scott", "avataaars") },
   ];
 
   return (
@@ -425,12 +427,11 @@ export default function DashboardPage() {
                     {i !== recentActivity.length - 1 && (
                       <div className="absolute top-9 left-4 bottom-[-24px] w-px bg-slate-200"></div>
                     )}
-                    <Image 
+                    <Avatar 
                       src={activity.avatar} 
-                      alt={activity.user} 
-                      width={32}
-                      height={32}
-                      className="w-8 h-8 rounded-full border border-slate-200 shadow-2xs shrink-0 z-10 bg-white object-cover" 
+                      name={activity.user} 
+                      size={32} 
+                      className="w-8 h-8 rounded-full border border-slate-200 shadow-2xs shrink-0 z-10" 
                     />
                     <div className="text-xs">
                       <p className="text-slate-700 leading-snug">

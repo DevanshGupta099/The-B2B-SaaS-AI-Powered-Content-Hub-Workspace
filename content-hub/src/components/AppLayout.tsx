@@ -46,6 +46,8 @@ import {
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useToast } from "@/components/ui/ToastNotifications";
+import { getAvatarUrl } from "@/lib/avatar";
+import { Avatar } from "@/components/ui/Avatar";
 
 export interface WorkspaceFolder {
   id: string;
@@ -129,7 +131,7 @@ export function AppLayout({ children, rightSidebarContent, folders = [] }: AppLa
     title: "Principal Engineer",
     bio: "Architecting governed multi-model content infrastructure.",
     timezone: "Asia/Kolkata (IST)",
-    avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+    avatarUrl: getAvatarUrl("Devansh Gupta", "bottts"),
     department: "Core Platform Architecture"
   });
   const profileRef = useRef<HTMLDivElement>(null);
@@ -548,9 +550,7 @@ export function AppLayout({ children, rightSidebarContent, folders = [] }: AppLa
                 className="flex items-center gap-2 p-1 rounded-full hover:ring-2 hover:ring-indigo-200 transition-all focus:outline-none"
                 aria-label="User Profile Menu"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#020617] to-indigo-900 text-white flex items-center justify-center font-bold text-xs shadow-md border-2 border-white ring-1 ring-slate-200">
-                  {profile.name ? profile.name.split(" ").map(n => n[0]).join("").slice(0, 2) : "DG"}
-                </div>
+                <Avatar src={profile.avatarUrl} name={profile.name} size={32} />
               </button>
 
               {/* Profile Menu Popover */}
@@ -559,9 +559,7 @@ export function AppLayout({ children, rightSidebarContent, folders = [] }: AppLa
                   {/* User Profile Card Header */}
                   <div className="p-4 bg-slate-50 border-b border-slate-200/80">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#020617] border border-[#1e293b] text-white flex items-center justify-center font-bold text-sm shadow-inner shrink-0">
-                        {profile.name ? profile.name.split(" ").map(n => n[0]).join("").slice(0, 2) : "DG"}
-                      </div>
+                      <Avatar src={profile.avatarUrl} name={profile.name} size={40} />
                       <div className="min-w-0">
                         <p className="font-heading font-bold text-sm text-slate-900 truncate">{profile.name}</p>
                         <p className="text-[11px] text-slate-500 font-mono truncate">{profile.email}</p>

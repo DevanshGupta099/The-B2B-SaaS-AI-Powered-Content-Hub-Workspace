@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { serverStore } from "@/lib/server-store";
+import { getAvatarUrl } from "@/lib/avatar";
 
 export async function GET() {
   try {
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
       docsCount: 0,
       membersCount: 1,
       color: color || "bg-indigo-600",
-      users: [{ id: "u2", name: "Devansh", avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80" }],
+      users: [{ id: "u2", name: "Devansh", avatarUrl: getAvatarUrl("Devansh", "bottts") }],
       tags: Array.isArray(tags) ? tags : ["General"]
     });
 
