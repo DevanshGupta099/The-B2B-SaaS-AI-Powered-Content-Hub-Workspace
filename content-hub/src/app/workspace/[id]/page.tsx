@@ -37,15 +37,25 @@ const collaborators: User[] = [
 
 interface Comment { id: string; author: string; message: string; time: string; }
 
-function ContextPanel({ comments, onComment, isAiThinking }: { comments: Comment[]; onComment: (message: string) => void; isAiThinking: boolean }) {
+function ContextPanel({ 
+  comments, 
+  onComment, 
+  isAiThinking,
+  activeCollaborators = collaborators 
+}: { 
+  comments: Comment[]; 
+  onComment: (message: string) => void; 
+  isAiThinking: boolean;
+  activeCollaborators?: User[];
+}) {
   const [message, setMessage] = useState("");
   return (
     <div className="flex h-full flex-col bg-slate-50">
       <div className="border-b border-slate-200 bg-white p-5">
         <h3 className="mb-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Active collaborators</h3>
         <div className="flex items-center justify-between">
-          <AvatarGroup users={collaborators} maxCount={4} />
-          <span className="text-xs font-semibold text-emerald-600">2 editing now</span>
+          <AvatarGroup users={activeCollaborators} maxCount={4} />
+          <span className="text-xs font-semibold text-indigo-600">{activeCollaborators.length} editing now</span>
         </div>
       </div>
       
@@ -111,6 +121,37 @@ export default function WorkspacePage() {
   const [isAiThinking, setIsAiThinking] = useState(false);
   const [isAiTransforming, setIsAiTransforming] = useState(false);
   const [aiMenuOpen, setAiMenuOpen] = useState(false);
+
+  const [activeCollaborators, setActiveCollaborators] = useState<User[]>(collaborators);
+
+  // Realtime collaboration room presence sync
+  useEffect(() => {
+    let isMounted = true;
+    const syncRoom = async () => {
+      try {
+        const res = await fetch(`/api/collaboration/room?roomId=${params.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.peers && Array.isArray(data.peers) && isMounted) {
+            setActiveCollaborators(data.peers.map((p: { id: string; name: string; role: string; avatarUrl: string }) => ({
+              id: p.id,
+              name: p.name,
+              role: p.role,
+              avatarUrl: p.avatarUrl
+            })));
+          }
+        }
+      } catch (err) {
+        console.warn("Realtime room heartbeat fallback:", err);
+      }
+    };
+    syncRoom();
+    const interval = setInterval(syncRoom, 8000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [params.id]);
 
   // Dynamic backend hydration: resolves document IDs and workspace IDs gracefully
   useEffect(() => {
@@ -313,6 +354,7 @@ export default function WorkspacePage() {
             comments={comments} 
             onComment={handleComment} 
             isAiThinking={isAiThinking} 
+            activeCollaborators={activeCollaborators}
           />
         }
       >
@@ -325,7 +367,7 @@ export default function WorkspacePage() {
           <div className="flex items-center gap-3">
             <div className="hidden items-center gap-2 sm:flex">
               <span className="text-[11px] text-slate-400 font-mono">Sync: Connected</span>
-              <AvatarGroup users={collaborators} maxCount={3} />
+              <AvatarGroup users={activeCollaborators} maxCount={3} />
             </div>
             <Button variant="ghost" size="sm" className="hidden px-2 sm:flex">
               <Settings className="h-4 w-4 text-slate-500" />

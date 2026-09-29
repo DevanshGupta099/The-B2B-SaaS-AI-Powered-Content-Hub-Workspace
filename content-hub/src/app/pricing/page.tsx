@@ -68,6 +68,38 @@ const plans = [
 export default function PricingPage() {
   const [annual, setAnnual] = useState(true);
 
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+
+  const handleCheckout = async (planName: string) => {
+    if (planName === "Enterprise") {
+      window.location.href = "/demo";
+      return;
+    }
+    const planId = planName.toLowerCase() === "pro" ? "pro" : "starter";
+    setLoadingPlan(planName);
+
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          planId,
+          billingCycle: annual ? "annual" : "monthly"
+        })
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        window.location.href = "/signup";
+      }
+    } catch {
+      window.location.href = "/signup";
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
+
   return (
     <MarketingShell>
       <main className="space-y-20 pb-28">
@@ -97,7 +129,7 @@ export default function PricingPage() {
                 }`}
               >
                 <span>Annual Billing</span>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-bold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full">
                   Save 20%
                 </span>
               </button>
@@ -156,17 +188,20 @@ export default function PricingPage() {
                   </div>
 
                   <div className="pt-8">
-                    <Link
-                      href={plan.name === "Enterprise" ? "/demo" : "/signup"}
+                    <button
+                      onClick={() => handleCheckout(plan.name)}
+                      disabled={loadingPlan === plan.name}
                       className={`w-full py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
                         plan.featured
                           ? "bg-[#020617] hover:bg-slate-800 text-white shadow-md"
                           : "bg-slate-100 hover:bg-slate-200 text-slate-900"
                       }`}
                     >
-                      {plan.name === "Enterprise" ? "Contact Enterprise Sales" : "Get Started Now"}
+                      {loadingPlan === plan.name 
+                        ? "Redirecting..." 
+                        : (plan.name === "Enterprise" ? "Contact Enterprise Sales" : "Get Started Now")}
                       <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+                    </button>
                   </div>
                 </div>
               );

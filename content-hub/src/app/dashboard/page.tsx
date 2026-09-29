@@ -469,9 +469,9 @@ export default function DashboardPage() {
                 <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700">Velocity Score</span>
                 <p className="font-heading text-2xl font-bold text-indigo-900 mt-0.5">{reportData.metrics.velocityScore}/100</p>
               </div>
-              <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-center">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Brand Compliance</span>
-                <p className="font-heading text-2xl font-bold text-emerald-900 mt-0.5">{reportData.metrics.brandCompliance}</p>
+              <div className="p-3.5 rounded-2xl bg-violet-50/70 border border-violet-200 text-center">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-violet-700">Brand Compliance</span>
+                <p className="font-heading text-2xl font-bold text-violet-900 mt-0.5">{reportData.metrics.brandCompliance}</p>
               </div>
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">Active Documents</span>
@@ -511,7 +511,7 @@ export default function DashboardPage() {
             {/* Brand Risk Assessment */}
             <div className="space-y-1.5">
               <h4 className="font-heading text-xs font-bold text-slate-900 flex items-center gap-1.5 uppercase tracking-wider">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Brand Governance & Voice Integrity
+                <ShieldCheck className="w-3.5 h-3.5 text-violet-600" /> Brand Governance & Voice Integrity
               </h4>
               <p className="text-slate-600 leading-relaxed text-xs">
                 {reportData.brandRiskAssessment}

@@ -8,7 +8,6 @@ import {
   Cpu, 
   ShieldCheck, 
   Radio, 
-  Clock,
   RefreshCw,
   Globe,
   Database
@@ -49,7 +48,25 @@ export default function StatusPage() {
   };
 
   useEffect(() => {
-    fetchHealth();
+    let isMounted = true;
+    fetch("/api/ai/health")
+      .then((res) => res.json())
+      .then((data: HealthData) => {
+        if (isMounted) {
+          setHealth(data);
+          setIsLoading(false);
+          setLastChecked(new Date().toLocaleTimeString());
+        }
+      })
+      .catch((err) => {
+        if (isMounted) {
+          console.error("Failed to load health telemetry:", err);
+          setIsLoading(false);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const groqConnected = health?.providers.groq?.status === "connected";

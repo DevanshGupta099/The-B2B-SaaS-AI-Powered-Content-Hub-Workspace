@@ -9,6 +9,7 @@
     "lint": "node ./node_modules/eslint/bin/eslint.js ."
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "@tailwindcss/typography": "^0.5.20",
     "clsx": "^2.1.1",
     "framer-motion": "^12.42.2",
@@ -16,6 +17,8 @@
     "next": "16.2.10",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "resend": "^6.30.0",
+    "stripe": "^22.6.2",
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {

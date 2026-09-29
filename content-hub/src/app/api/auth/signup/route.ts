@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const existing = serverStore.findUserByEmail(cleanEmail);
+    const existing = await serverStore.findUserByEmailAsync(cleanEmail);
 
     if (existing) {
       return NextResponse.json(
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       ? name.trim() 
       : cleanEmail.split("@")[0];
 
-    const newUser = serverStore.createUser({
+    const newUser = await serverStore.createUserAsync({
       name: cleanName,
       email: cleanEmail,
       password: password,
@@ -57,9 +57,10 @@ export async function POST(req: NextRequest) {
     });
 
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to create account";
     return NextResponse.json(
-      { error: error.message || "Failed to create account" },
+      { error: message },
       { status: 500 }
     );
   }

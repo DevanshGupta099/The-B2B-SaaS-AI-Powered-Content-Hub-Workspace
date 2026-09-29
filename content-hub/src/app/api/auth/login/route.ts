@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = serverStore.validateCredentials(email, password);
+    const result = await serverStore.validateCredentialsAsync(email, password);
 
     if (!result.valid || !result.user) {
       return NextResponse.json(
@@ -45,9 +45,10 @@ export async function POST(req: NextRequest) {
     });
 
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to authenticate";
     return NextResponse.json(
-      { error: error.message || "Failed to authenticate" },
+      { error: message },
       { status: 500 }
     );
   }

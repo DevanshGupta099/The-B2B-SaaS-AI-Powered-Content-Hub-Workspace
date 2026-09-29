@@ -683,6 +683,65 @@ class BackendStore {
     };
     return { valid: true, user: safeUser };
   }
+
+  async findUserByEmailAsync(email: string): Promise<BackendUser | undefined> {
+    const normalized = email.trim().toLowerCase();
+    try {
+      const { dbRepo } = await import("./db-repo");
+      const dbUser = await dbRepo.findUserByEmail(normalized);
+      if (dbUser) {
+        const idx = this.users.findIndex(u => u.email.toLowerCase() === normalized);
+        if (idx >= 0) this.users[idx] = dbUser;
+        else this.users.push(dbUser);
+        return dbUser;
+      }
+    } catch (err) {
+      console.warn("Neon user lookup fallback:", err);
+    }
+    return this.findUserByEmail(normalized);
+  }
+
+  async createUserAsync(data: { name: string; email: string; password: string; role?: string; workspaceName?: string }): Promise<Omit<BackendUser, "password">> {
+    const user = this.createUser(data);
+    const fullUser = this.findUserByEmail(data.email);
+    if (fullUser) {
+      try {
+        const { dbRepo } = await import("./db-repo");
+        await dbRepo.createUser(fullUser);
+        await dbRepo.logActivity(fullUser.name, "created account", fullUser.workspaceName || "Workspace");
+      } catch (err) {
+        console.warn("Neon user sync fallback:", err);
+      }
+    }
+    return user;
+  }
+
+  async validateCredentialsAsync(email: string, password: string): Promise<{ valid: boolean; user?: Omit<BackendUser, "password">; reason?: string }> {
+    const normalized = email.trim().toLowerCase();
+    try {
+      const { dbRepo } = await import("./db-repo");
+      const dbUser = await dbRepo.findUserByEmail(normalized);
+      if (dbUser) {
+        if (dbUser.password !== password) {
+          return { valid: false, reason: "Incorrect password entered" };
+        }
+        return {
+          valid: true,
+          user: {
+            id: dbUser.id,
+            name: dbUser.name,
+            email: dbUser.email,
+            role: dbUser.role,
+            workspaceName: dbUser.workspaceName,
+            createdAt: dbUser.createdAt
+          }
+        };
+      }
+    } catch (err) {
+      console.warn("Neon credentials validation fallback:", err);
+    }
+    return this.validateCredentials(normalized, password);
+  }
 }
 
 // Global singleton to survive Next.js module reloads in dev
