@@ -150,9 +150,8 @@ export default function DashboardPage() {
     });
   };
 
-  // Signature Obsidian Jet Black (#020617) for primary metric card
   const metrics = [
-    { label: "Active Documents", value: "24", icon: FileText, color: "text-white", bg: "bg-[#020617]", border: "border-[#1e293b]" },
+    { label: "Active Documents", value: "24", icon: FileText, color: "text-indigo-600", bg: "bg-white", border: "border-slate-200" },
     { label: "AI Tokens Used", value: "85.2k", icon: Sparkles, color: "text-white", bg: "bg-indigo-600", border: "border-indigo-500" },
     { label: "Brand SLA & Compliance", value: "99.4%", icon: ShieldCheck, color: "text-slate-900", bg: "bg-white", border: "border-slate-200" }
   ];
@@ -171,7 +170,7 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="bg-[#020617] text-white border border-[#1e293b] font-bold text-[11px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+              <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold text-[11px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                 Governed Workspace
               </span>
               <span className="text-slate-400 text-xs">· Node 01 (US-East)</span>
@@ -187,9 +186,9 @@ export default function DashboardPage() {
           <Button
             onClick={handleGenerateReport}
             isLoading={isGeneratingReport}
-            className="flex items-center gap-2 bg-[#020617] hover:bg-slate-900 text-white font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md border border-[#1e293b]"
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md border border-indigo-500/20"
           >
-            <Sparkles className="w-4 h-4 text-indigo-400" />
+            <Sparkles className="w-4 h-4 text-indigo-200" />
             {isGeneratingReport ? "Synthesizing Report..." : "Generate Report"}
           </Button>
         </div>
@@ -230,26 +229,26 @@ export default function DashboardPage() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-3xl bg-gradient-to-br from-[#020617] via-[#090d16] to-[#020617] text-white border border-[#1e293b] p-6 lg:p-8 shadow-2xl relative overflow-hidden space-y-6"
+          className="rounded-3xl bg-white border border-slate-200/90 p-6 lg:p-8 shadow-xl shadow-slate-200/40 relative overflow-hidden space-y-6"
         >
-          {/* Ambient Glows */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+          {/* Subtle Ambient Light Accents */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-100/40 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-violet-100/30 rounded-full blur-3xl pointer-events-none" />
 
           {/* Top Pill & Title */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/80 border border-emerald-800/80 px-2.5 py-0.5 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse" />
                   Live Executive Intelligence
                 </span>
                 <span className="text-slate-400 text-xs font-mono">Groq Qwen 3.8-27b</span>
               </div>
-              <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-white mt-1">
+              <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mt-1">
                 {reportData.title}
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 Period: {reportData.period} · Orchestrated continuously across active workspaces
               </p>
             </div>
@@ -258,7 +257,7 @@ export default function DashboardPage() {
               <Button
                 onClick={handleGenerateReport}
                 isLoading={isGeneratingReport}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg border border-indigo-400/30 flex items-center gap-2"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md border border-indigo-500/20 flex items-center gap-2"
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 {isGeneratingReport ? "Synthesizing..." : "Generate Fresh Report"}
@@ -266,7 +265,7 @@ export default function DashboardPage() {
               <Button
                 variant="outline"
                 onClick={() => setReportModalOpen(true)}
-                className="bg-white/5 hover:bg-white/10 text-white border-white/10 font-bold text-xs rounded-xl flex items-center gap-1.5"
+                className="bg-white hover:bg-slate-50 text-slate-700 border-slate-200 font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-xs"
               >
                 Full Dossier <ChevronRight className="w-3.5 h-3.5" />
               </Button>
@@ -275,66 +274,66 @@ export default function DashboardPage() {
 
           {/* KPI Dashboard Cards Bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 relative z-10">
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Velocity Score</span>
+            <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Velocity Score</span>
               <div className="flex items-baseline gap-2">
-                <span className="font-heading text-3xl font-bold text-white">{reportData.metrics.velocityScore}</span>
-                <span className="text-emerald-400 text-xs font-bold">+18% WoW</span>
+                <span className="font-heading text-3xl font-bold text-slate-900">{reportData.metrics.velocityScore}</span>
+                <span className="text-indigo-600 text-xs font-bold bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100">+18% WoW</span>
               </div>
-              <div className="w-full bg-white/10 rounded-full h-1.5 mt-2 overflow-hidden">
-                <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${reportData.metrics.velocityScore}%` }} />
+              <div className="w-full bg-slate-200/70 rounded-full h-1.5 mt-2 overflow-hidden">
+                <div className="bg-indigo-600 h-full rounded-full" style={{ width: `${reportData.metrics.velocityScore}%` }} />
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Brand Compliance</span>
+            <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Brand Compliance</span>
               <div className="flex items-baseline gap-2">
-                <span className="font-heading text-3xl font-bold text-white">{reportData.metrics.brandCompliance}</span>
-                <span className="text-slate-400 text-xs">SLA Met</span>
+                <span className="font-heading text-3xl font-bold text-slate-900">{reportData.metrics.brandCompliance}</span>
+                <span className="text-slate-500 text-xs">SLA Met</span>
               </div>
-              <div className="w-full bg-white/10 rounded-full h-1.5 mt-2 overflow-hidden">
-                <div className="bg-indigo-500 h-full rounded-full" style={{ width: "99.4%" }} />
+              <div className="w-full bg-slate-200/70 rounded-full h-1.5 mt-2 overflow-hidden">
+                <div className="bg-violet-600 h-full rounded-full" style={{ width: "99.4%" }} />
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Active Documents</span>
+            <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Active Documents</span>
               <div className="flex items-baseline gap-2">
-                <span className="font-heading text-3xl font-bold text-white">{reportData.metrics.activeDocuments}</span>
-                <span className="text-slate-400 text-xs">3 Workspaces</span>
+                <span className="font-heading text-3xl font-bold text-slate-900">{reportData.metrics.activeDocuments}</span>
+                <span className="text-slate-500 text-xs">3 Workspaces</span>
               </div>
-              <div className="w-full bg-white/10 rounded-full h-1.5 mt-2 overflow-hidden">
-                <div className="bg-purple-500 h-full rounded-full" style={{ width: "80%" }} />
+              <div className="w-full bg-slate-200/70 rounded-full h-1.5 mt-2 overflow-hidden">
+                <div className="bg-cyan-600 h-full rounded-full" style={{ width: "80%" }} />
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Pipeline ARR</span>
+            <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Pipeline ARR</span>
               <div className="flex items-baseline gap-2">
-                <span className="font-heading text-3xl font-bold text-white">{reportData.metrics.projectedPipeline}</span>
-                <span className="text-emerald-400 text-xs font-bold">+$320k</span>
+                <span className="font-heading text-3xl font-bold text-slate-900">{reportData.metrics.projectedPipeline}</span>
+                <span className="text-indigo-600 text-xs font-bold bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100">+$320k</span>
               </div>
-              <div className="w-full bg-white/10 rounded-full h-1.5 mt-2 overflow-hidden">
+              <div className="w-full bg-slate-200/70 rounded-full h-1.5 mt-2 overflow-hidden">
                 <div className="bg-amber-500 h-full rounded-full" style={{ width: "92%" }} />
               </div>
             </div>
           </div>
 
           {/* Executive Summary & Insights Box */}
-          <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 space-y-4 relative z-10 text-xs">
+          <div className="p-5 rounded-2xl bg-indigo-50/40 border border-indigo-100 space-y-4 relative z-10 text-xs">
             <div className="space-y-1.5">
-              <h3 className="font-heading text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
-                <TrendingUp className="w-3.5 h-3.5 text-indigo-400" /> Executive Velocity Snapshot
+              <h3 className="font-heading text-xs font-bold text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5 text-indigo-600" /> Executive Velocity Snapshot
               </h3>
-              <p className="text-slate-300 leading-relaxed">
+              <p className="text-slate-700 leading-relaxed">
                 {reportData.executiveSummary}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-white/10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-indigo-100">
               {reportData.contentVelocityInsights.slice(0, 3).map((insight, idx) => (
-                <div key={idx} className="flex items-start gap-2 text-slate-300">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                <div key={idx} className="flex items-start gap-2 text-slate-700">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0 mt-0.5" />
                   <span className="leading-snug text-[11px]">{insight}</span>
                 </div>
               ))}
@@ -342,21 +341,21 @@ export default function DashboardPage() {
           </div>
 
           {/* Action Row */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-white/10 text-xs relative z-10">
-            <div className="flex items-center gap-2 text-slate-400 text-[11px]">
-              <Cpu className="w-3.5 h-3.5 text-indigo-400" />
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-100 text-xs relative z-10">
+            <div className="flex items-center gap-2 text-slate-500 text-[11px]">
+              <Cpu className="w-3.5 h-3.5 text-indigo-600" />
               <span>Zero-retention data privacy guarantee active</span>
             </div>
             <div className="flex items-center gap-2">
               <button 
                 onClick={copyReportMarkdown}
-                className="text-slate-300 hover:text-white flex items-center gap-1.5 text-xs font-semibold py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                className="text-slate-600 hover:text-slate-900 flex items-center gap-1.5 text-xs font-semibold py-1.5 px-3 rounded-lg bg-slate-100 hover:bg-slate-200/80 transition-colors"
               >
                 <Copy className="w-3 h-3" /> Copy Markdown
               </button>
               <button 
                 onClick={() => setReportModalOpen(true)}
-                className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-xs font-bold py-1.5 px-3 rounded-lg hover:bg-indigo-500/10 transition-colors"
+                className="text-indigo-600 hover:text-indigo-700 flex items-center gap-1 text-xs font-bold py-1.5 px-3 rounded-lg hover:bg-indigo-50 transition-colors"
               >
                 View Full Briefing Modal →
               </button>

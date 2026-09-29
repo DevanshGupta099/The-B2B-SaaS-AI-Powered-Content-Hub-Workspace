@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="nexus-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="50%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+    <filter id="glow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#4338ca" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- Squircle Base -->
+  <rect width="64" height="64" rx="16" fill="url(#nexus-grad)" filter="url(#glow)" />
+  
+  <!-- Subtle Inner Border -->
+  <rect x="1" y="1" width="62" height="62" rx="15" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.5" />
+
+  <!-- Modern Nexus Geometric "N" Monogram -->
+  <path 
+    d="M19 45V19H25L39 39V19H45V45H39L25 25V45H19Z" 
+    fill="#ffffff" 
+    fill-rule="evenodd"
+  />
+
+  <!-- Subtle Dynamic Energy Accent in N Diagonal -->
+  <circle cx="45" cy="19" r="3" fill="#38bdf8" />
+</svg>

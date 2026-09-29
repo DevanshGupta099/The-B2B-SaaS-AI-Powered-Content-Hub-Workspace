@@ -60,6 +60,16 @@ export interface BackendNotification {
   link?: string;
 }
 
+export interface BackendUser {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+  workspaceName?: string;
+  createdAt: string;
+}
+
 export interface BackendUserProfile {
   id: string;
   name: string;
@@ -586,6 +596,78 @@ class BackendStore {
 
   clearNotifications(): void {
     this.notifications = [];
+  }
+
+  // Users & Authentication
+  private users: BackendUser[] = [
+    {
+      id: "user-1",
+      name: "Devansh Gupta",
+      email: "devanshgupta091@gmail.com",
+      password: "password123",
+      role: "Owner",
+      workspaceName: "Nexus Enterprise Workspace",
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: "user-2",
+      name: "Sarah Connor",
+      email: "sarah@company.com",
+      password: "password123",
+      role: "Editor",
+      workspaceName: "Growth Operations",
+      createdAt: new Date().toISOString()
+    }
+  ];
+
+  findUserByEmail(email: string): BackendUser | undefined {
+    return this.users.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
+  }
+
+  createUser(data: { name: string; email: string; password: string; role?: string; workspaceName?: string }): Omit<BackendUser, "password"> {
+    const newUser: BackendUser = {
+      id: `user-${Date.now()}`,
+      name: data.name.trim(),
+      email: data.email.trim().toLowerCase(),
+      password: data.password,
+      role: data.role || "Owner",
+      workspaceName: data.workspaceName?.trim() || `${data.name.trim()}'s Workspace`,
+      createdAt: new Date().toISOString()
+    };
+    this.users.push(newUser);
+
+    // Also update current active profile
+    this.profile = {
+      ...this.profile,
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role
+    };
+
+    // Log in activity
+    this.addActivity({
+      user: newUser.name,
+      action: "created workspace account",
+      document: newUser.workspaceName || "New Workspace",
+      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"
+    });
+
+    const { password, ...safeUser } = newUser;
+    return safeUser;
+  }
+
+  validateCredentials(email: string, password: string): { valid: boolean; user?: Omit<BackendUser, "password">; reason?: string } {
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = this.findUserByEmail(normalizedEmail);
+    if (!user) {
+      return { valid: false, reason: "No account found with this email address" };
+    }
+    if (user.password !== password) {
+      return { valid: false, reason: "Incorrect password entered" };
+    }
+    const { password: _, ...safeUser } = user;
+    return { valid: true, user: safeUser };
   }
 }
 

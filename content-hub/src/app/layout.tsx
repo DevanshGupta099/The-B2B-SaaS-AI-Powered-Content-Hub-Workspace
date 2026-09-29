@@ -55,6 +55,13 @@ export const metadata: Metadata = {
     title: "Nexus - Governed B2B AI Content OS & Workspace",
     description: "Enterprise AI-powered content hub with deterministic brand governance & multi-model orchestration.",
   },
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.svg",
+    apple: "/apple-icon",
+  },
   robots: {
     index: true,
     follow: true,
