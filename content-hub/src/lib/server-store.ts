@@ -653,7 +653,14 @@ class BackendStore {
       avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"
     });
 
-    const { password, ...safeUser } = newUser;
+    const safeUser: Omit<BackendUser, "password"> = {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+      workspaceName: newUser.workspaceName,
+      createdAt: newUser.createdAt
+    };
     return safeUser;
   }
 
@@ -666,7 +673,14 @@ class BackendStore {
     if (user.password !== password) {
       return { valid: false, reason: "Incorrect password entered" };
     }
-    const { password: _, ...safeUser } = user;
+    const safeUser: Omit<BackendUser, "password"> = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      workspaceName: user.workspaceName,
+      createdAt: user.createdAt
+    };
     return { valid: true, user: safeUser };
   }
 }

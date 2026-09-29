@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { 
   FileText, 
   Sparkles, 
-  CheckSquare, 
   MoreHorizontal, 
   Clock, 
   ArrowRight,
@@ -12,15 +11,13 @@ import {
   ShieldCheck,
   Zap,
   Copy,
-  Download,
   Printer,
   CheckCircle2,
-  ExternalLink,
   ChevronRight,
-  BarChart3,
   Cpu
 } from "lucide-react";
 import { AvatarGroup } from "@/components/ui/AvatarGroup";
+import Image from "next/image";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/ToastNotifications";
@@ -151,7 +148,7 @@ export default function DashboardPage() {
   };
 
   const metrics = [
-    { label: "Active Documents", value: "24", icon: FileText, color: "text-indigo-600", bg: "bg-white", border: "border-slate-200" },
+    { label: "Active Documents", value: "24", icon: FileText, color: "text-white", bg: "bg-[#020617]", border: "border-[#1e293b]" },
     { label: "AI Tokens Used", value: "85.2k", icon: Sparkles, color: "text-white", bg: "bg-indigo-600", border: "border-indigo-500" },
     { label: "Brand SLA & Compliance", value: "99.4%", icon: ShieldCheck, color: "text-slate-900", bg: "bg-white", border: "border-slate-200" }
   ];
@@ -170,7 +167,7 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold text-[11px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+              <span className="bg-[#020617] text-white border border-[#1e293b] font-bold text-[11px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                 Governed Workspace
               </span>
               <span className="text-slate-400 text-xs">· Node 01 (US-East)</span>
@@ -186,9 +183,9 @@ export default function DashboardPage() {
           <Button
             onClick={handleGenerateReport}
             isLoading={isGeneratingReport}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md border border-indigo-500/20"
+            className="flex items-center gap-2 bg-[#020617] hover:bg-slate-900 text-white font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md border border-[#1e293b]"
           >
-            <Sparkles className="w-4 h-4 text-indigo-200" />
+            <Sparkles className="w-4 h-4 text-indigo-400" />
             {isGeneratingReport ? "Synthesizing Report..." : "Generate Report"}
           </Button>
         </div>
@@ -225,7 +222,7 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* PROMINENT DEDICATED EXECUTIVE INTELLIGENCE REPORT CARD */}
+        {/* PROMINENT DEDICATED EXECUTIVE INTELLIGENCE REPORT CARD (White Card, Non-Green Accents, Black Button) */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -257,9 +254,9 @@ export default function DashboardPage() {
               <Button
                 onClick={handleGenerateReport}
                 isLoading={isGeneratingReport}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md border border-indigo-500/20 flex items-center gap-2"
+                className="bg-[#020617] hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-md border border-[#1e293b] flex items-center gap-2"
               >
-                <Sparkles className="w-3.5 h-3.5" />
+                <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
                 {isGeneratingReport ? "Synthesizing..." : "Generate Fresh Report"}
               </Button>
               <Button
@@ -428,9 +425,11 @@ export default function DashboardPage() {
                     {i !== recentActivity.length - 1 && (
                       <div className="absolute top-9 left-4 bottom-[-24px] w-px bg-slate-200"></div>
                     )}
-                    <img 
+                    <Image 
                       src={activity.avatar} 
                       alt={activity.user} 
+                      width={32}
+                      height={32}
                       className="w-8 h-8 rounded-full border border-slate-200 shadow-2xs shrink-0 z-10 bg-white object-cover" 
                     />
                     <div className="text-xs">

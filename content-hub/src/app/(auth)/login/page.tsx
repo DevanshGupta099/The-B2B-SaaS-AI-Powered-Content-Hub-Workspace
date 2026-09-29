@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
-import { Sparkles, AlertCircle, CheckCircle2, Lock, Mail, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import { AlertCircle, Lock, Mail, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -33,8 +34,9 @@ export default function LoginPage() {
       }
 
       router.push("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "An error occurred during authentication");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "An error occurred during authentication";
+      setError(message);
     } finally {
       setIsLoading(false);
     }
@@ -79,9 +81,9 @@ export default function LoginPage() {
           
           <div className="mt-10 flex items-center gap-4 text-sm font-medium text-slate-400">
             <div className="flex -space-x-2">
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" alt="Sarah" className="w-9 h-9 rounded-full border-2 border-slate-900" />
-              <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80" alt="Devansh" className="w-9 h-9 rounded-full border-2 border-slate-900" />
-              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80" alt="Michael" className="w-9 h-9 rounded-full border-2 border-slate-900" />
+              <Image src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" alt="Sarah" width={36} height={36} className="w-9 h-9 rounded-full border-2 border-slate-900 object-cover" />
+              <Image src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80" alt="Devansh" width={36} height={36} className="w-9 h-9 rounded-full border-2 border-slate-900 object-cover" />
+              <Image src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80" alt="Michael" width={36} height={36} className="w-9 h-9 rounded-full border-2 border-slate-900 object-cover" />
             </div>
             <p className="text-xs">Active sessions authenticated via backend store</p>
           </div>

@@ -7,10 +7,13 @@ This guide covers operational best practices, token quota governor management, r
 ## 1. Rate Limiting & Groq OTPM Handling
 
 ### The 1,000 OTPM Ceiling
+
 Groq's free-tier rate limits enforce **1,000 Output Tokens Per Minute (OTPM)** on models like `qwen/qwen3.8-27b`. Groq pre-evaluates `Used + Requested > 1000`.
 
 ### Adaptive Rate Governor (`src/lib/ai-service.ts`)
+
 Nexus implements an adaptive rate governor:
+
 1. **Dynamic Headroom:** Default `maxTokens` is capped at 700 (or 250-500 for structured JSON endpoints).
 2. **Deterministic 429 Parsing:** When a `429 Too Many Requests` is returned:
    - Nexus regex-matches `Used <n> tokens` and `try again in <x>s`.
@@ -30,6 +33,7 @@ node scripts/test-api.mjs
 ```
 
 This verifies:
+
 - Health ping latency
 - Universal Chat Generation
 - Deterministic Brand Voice Linters
@@ -45,9 +49,11 @@ This verifies:
 ## 3. Troubleshooting Common Issues
 
 ### Issue: "Loading document..." hangs permanently
+
 - **Root Cause:** A workspace ID (e.g. `1`, `marketing`) was requested, but only specific document IDs were queried.
 - **Solution:** Nexus now routes all document queries through `GET /api/documents/[id]`, which resolves workspace primary documents and auto-seeds initial drafts if empty.
 
 ### Issue: GitHub Push Declined (Push Protection)
+
 - **Root Cause:** Raw API keys committed in source files.
 - **Solution:** Never commit keys in `.ts` or `.json`. All secrets must strictly reside in `.env` / `.env.local` and be accessed via `process.env`.

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
-import { AlertCircle, CheckCircle2, Lock, Mail, User, Building, ArrowRight } from "lucide-react";
+import { AlertCircle, Lock, Mail, User, Building, ArrowRight } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -35,8 +35,9 @@ export default function SignupPage() {
       }
 
       router.push("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "An error occurred during account creation");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "An error occurred during account creation";
+      setError(message);
     } finally {
       setLoading(false);
     }

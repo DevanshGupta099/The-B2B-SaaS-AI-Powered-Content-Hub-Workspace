@@ -1,4 +1,6 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nexus Content Hub Web Application
+
+This is the Next.js frontend application for Nexus B2B Content OS.
 
 ## Getting Started
 
