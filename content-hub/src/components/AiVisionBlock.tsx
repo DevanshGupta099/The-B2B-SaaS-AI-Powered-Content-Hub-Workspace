@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   UploadCloud, 
@@ -236,9 +237,12 @@ ${results.extractedText ? `**Extracted Content:**\n${results.extractedText}` : "
 
           {/* Image Container with Scanning Overlay */}
           <div className="relative w-full max-h-96 bg-slate-900 overflow-hidden flex items-center justify-center">
-            <img 
+            <Image 
               src={image} 
-              alt={fileName || "Uploaded"} 
+              alt={fileName || "Uploaded Image"} 
+              width={800}
+              height={500}
+              unoptimized
               className="max-h-96 w-auto object-contain transition-transform duration-700" 
             />
             
