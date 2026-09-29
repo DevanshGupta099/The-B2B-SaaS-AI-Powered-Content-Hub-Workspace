@@ -48,7 +48,10 @@ export async function POST(req: NextRequest) {
       user: newUser
     }, { status: 201 });
 
-    response.cookies.set("nexus_session", newUser.id, {
+    const { createSessionToken } = await import("@/lib/auth-crypto");
+    const signedToken = createSessionToken(newUser.id);
+
+    response.cookies.set("nexus_session", signedToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

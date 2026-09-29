@@ -625,11 +625,13 @@ class BackendStore {
   }
 
   createUser(data: { name: string; email: string; password: string; role?: string; workspaceName?: string }): Omit<BackendUser, "password"> {
+    const { hashPassword } = require("./auth-crypto");
+    const hashedPassword = hashPassword(data.password);
     const newUser: BackendUser = {
       id: `user-${Date.now()}`,
       name: data.name.trim(),
       email: data.email.trim().toLowerCase(),
-      password: data.password,
+      password: hashedPassword,
       role: data.role || "Owner",
       workspaceName: data.workspaceName?.trim() || `${data.name.trim()}'s Workspace`,
       createdAt: new Date().toISOString()
@@ -670,7 +672,8 @@ class BackendStore {
     if (!user) {
       return { valid: false, reason: "No account found with this email address" };
     }
-    if (user.password !== password) {
+    const { verifyPassword } = require("./auth-crypto");
+    if (!verifyPassword(password, user.password)) {
       return { valid: false, reason: "Incorrect password entered" };
     }
     const safeUser: Omit<BackendUser, "password"> = {
@@ -722,7 +725,8 @@ class BackendStore {
       const { dbRepo } = await import("./db-repo");
       const dbUser = await dbRepo.findUserByEmail(normalized);
       if (dbUser) {
-        if (dbUser.password !== password) {
+        const { verifyPassword } = await import("./auth-crypto");
+        if (!verifyPassword(password, dbUser.password)) {
           return { valid: false, reason: "Incorrect password entered" };
         }
         return {

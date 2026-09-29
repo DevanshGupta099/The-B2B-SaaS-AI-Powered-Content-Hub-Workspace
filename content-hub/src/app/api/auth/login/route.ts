@@ -29,14 +29,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Set secure authentication cookie
+    // Set cryptographically signed session cookie
     const response = NextResponse.json({
       success: true,
       message: "Authentication successful",
       user: result.user
     });
 
-    response.cookies.set("nexus_session", result.user.id, {
+    const { createSessionToken } = await import("@/lib/auth-crypto");
+    const signedToken = createSessionToken(result.user.id);
+
+    response.cookies.set("nexus_session", signedToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
