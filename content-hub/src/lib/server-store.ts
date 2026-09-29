@@ -28,6 +28,7 @@ export interface BackendDocument {
   content: string;
   tags?: string[];
   status?: "Draft" | "In Review" | "Approved" | "Published";
+  complianceScore?: number;
 }
 
 export interface BackendMediaAsset {

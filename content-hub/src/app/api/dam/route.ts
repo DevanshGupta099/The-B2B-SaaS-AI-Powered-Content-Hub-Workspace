@@ -54,14 +54,21 @@ export async function POST(req: Request) {
       }
     }
 
+    let finalPreviewUrl = previewUrl || "/nexus-hero-3d.jpg";
+    if (prompt && (!previewUrl || previewUrl === "/nexus-hero-3d.jpg")) {
+      const cleanPrompt = encodeURIComponent(prompt.trim());
+      const seed = Date.now();
+      finalPreviewUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=1280&height=720&nologo=true&seed=${seed}`;
+    }
+
     const created = serverStore.addMediaAsset({
-      name: name || `asset-${Date.now()}.${type === "svg" ? "svg" : "jpg"}`,
+      name: name || `ai-${Date.now()}.${type === "svg" ? "svg" : "jpg"}`,
       folder: folder || "Hero Graphics",
       type: type || "image",
       size: size || "2.1 MB",
       tags: Array.isArray(tags) && tags.length > 0 ? tags : ["AI Media", "DAM Sync"],
       dimensions: dimensions || "1920 x 1080",
-      previewUrl: previewUrl || "/nexus-hero-3d.jpg",
+      previewUrl: finalPreviewUrl,
       aiAutoTags
     });
 

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/ToastNotifications";
+import { Avatar } from "@/components/ui/Avatar";
 
 type CampaignStage = 
   | "Ideation" 
@@ -28,6 +29,16 @@ type CampaignStage =
   | "Approved" 
   | "Scheduled" 
   | "Published";
+
+const stageMeta: Record<CampaignStage, { label: string; accent: string; badge: string; border: string }> = {
+  "Ideation": { label: "Ideation", accent: "bg-purple-500", badge: "bg-purple-50 text-purple-700 border-purple-200", border: "border-t-purple-500" },
+  "Briefing": { label: "Briefing", accent: "bg-blue-500", badge: "bg-blue-50 text-blue-700 border-blue-200", border: "border-t-blue-500" },
+  "First Draft": { label: "First Draft", accent: "bg-cyan-500", badge: "bg-cyan-50 text-cyan-700 border-cyan-200", border: "border-t-cyan-500" },
+  "Legal Review": { label: "Legal Review", accent: "bg-amber-500", badge: "bg-amber-50 text-amber-700 border-amber-200", border: "border-t-amber-500" },
+  "Approved": { label: "Approved", accent: "bg-emerald-500", badge: "bg-emerald-50 text-emerald-700 border-emerald-200", border: "border-t-emerald-500" },
+  "Scheduled": { label: "Scheduled", accent: "bg-indigo-500", badge: "bg-indigo-50 text-indigo-700 border-indigo-200", border: "border-t-indigo-500" },
+  "Published": { label: "Published", accent: "bg-slate-900", badge: "bg-slate-100 text-slate-800 border-slate-300", border: "border-t-slate-900" },
+};
 
 interface CampaignItem {
   id: string;
@@ -196,62 +207,88 @@ export default function PlannerPage() {
 
         {/* 1. KANBAN BOARD VIEW */}
         {viewMode === "kanban" && (
-          <div className="flex gap-4 overflow-x-auto pb-6">
+          <div className="flex gap-5 overflow-x-auto pb-6 scrollbar-thin">
             {stages.map((stage) => {
+              const meta = stageMeta[stage];
               const stageCards = filteredCards.filter(c => c.stage === stage);
               return (
-                <div key={stage} className="w-72 shrink-0 space-y-3">
-                  <div className="flex items-center justify-between px-1">
-                    <span className="font-heading text-xs font-bold uppercase tracking-wider text-slate-700">
-                      {stage}
-                    </span>
-                    <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-200/70 px-2 py-0.5 rounded-full">
-                      {stageCards.length}
-                    </span>
+                <div key={stage} className="w-80 min-w-[300px] shrink-0 flex flex-col gap-3">
+                  {/* Column Header */}
+                  <div className="flex items-center justify-between p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs">
+                    <div className="flex items-center gap-2.5">
+                      <span className={`w-2.5 h-2.5 rounded-full ${meta.accent}`} />
+                      <span className="font-heading text-xs font-bold uppercase tracking-wider text-slate-900">
+                        {stage}
+                      </span>
+                      <span className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded-full border ${meta.badge}`}>
+                        {stageCards.length}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setNewStage(stage);
+                        setIsNewModalOpen(true);
+                      }}
+                      className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-900 transition-colors"
+                      title={`Add item to ${stage}`}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
                   </div>
 
-                  <div className="min-h-[460px] p-3 rounded-2xl bg-slate-100/70 border border-slate-200/80 space-y-3">
+                  {/* Dropzone Column */}
+                  <div className={`flex-1 min-h-[500px] p-3 rounded-3xl bg-slate-100/70 border border-slate-200/90 space-y-3.5 border-t-4 ${meta.border}`}>
                     {stageCards.map((card) => (
                       <div
                         key={card.id}
-                        className="p-4 rounded-xl bg-white border border-slate-200/90 space-y-3 shadow-xs hover:border-indigo-400 hover:shadow-md transition-all"
+                        className="p-4 rounded-2xl bg-white border border-slate-200/90 space-y-3 shadow-xs hover:border-indigo-400 hover:shadow-md transition-all group"
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-md border border-indigo-200">
                             {card.channel}
                           </span>
-                          <button
-                            onClick={() => handleDeleteItem(card.id)}
-                            className="text-slate-400 hover:text-rose-600 p-1 transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          <div className="flex items-center gap-1.5">
+                            {card.reachEstimate && (
+                              <span className="text-[10px] font-semibold text-slate-500 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+                                {card.reachEstimate}
+                              </span>
+                            )}
+                            <button
+                              onClick={() => handleDeleteItem(card.id)}
+                              className="text-slate-300 hover:text-rose-600 p-1 transition-colors rounded hover:bg-rose-50 opacity-0 group-hover:opacity-100"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
 
                         <h4 className="text-xs font-bold text-slate-900 leading-snug">
                           {card.title}
                         </h4>
 
-                        <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                        <div className="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
                           <span className="flex items-center gap-1 font-medium">
                             <Clock className="w-3 h-3 text-slate-400" /> {card.dueDate}
                           </span>
-                          <span className="font-semibold text-slate-700">{card.author}</span>
+                          <div className="flex items-center gap-1.5">
+                            <Avatar name={card.author} size={20} />
+                            <span className="font-semibold text-slate-700 text-xs">{card.author}</span>
+                          </div>
                         </div>
 
-                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-600">
+                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold">
                           <button
                             disabled={stage === stages[0]}
                             onClick={() => move(card.id, -1)}
-                            className="hover:text-slate-900 disabled:opacity-20 px-2 py-1 rounded hover:bg-slate-100 transition-colors"
+                            className="text-slate-500 hover:text-slate-900 disabled:opacity-20 px-2.5 py-1 rounded-lg hover:bg-slate-100 transition-colors"
                           >
                             ← Back
                           </button>
                           <button
                             disabled={stage === stages[stages.length - 1]}
                             onClick={() => move(card.id, 1)}
-                            className="text-indigo-600 hover:text-indigo-700 disabled:opacity-20 px-2 py-1 rounded hover:bg-indigo-50 transition-colors font-semibold"
+                            className="text-indigo-600 hover:text-indigo-800 disabled:opacity-20 px-2.5 py-1 rounded-lg hover:bg-indigo-50 transition-colors font-semibold"
                           >
                             Advance →
                           </button>
@@ -259,8 +296,18 @@ export default function PlannerPage() {
                       </div>
                     ))}
                     {stageCards.length === 0 && (
-                      <div className="h-32 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center text-xs text-slate-400 font-medium">
-                        No items in {stage}
+                      <div className="h-40 border-2 border-dashed border-slate-200/90 rounded-2xl flex flex-col items-center justify-center text-xs text-slate-400 font-medium gap-1.5 p-4 text-center">
+                        <span className="text-slate-300 font-mono text-[11px]">Empty Stage</span>
+                        <span>No items in {stage}</span>
+                        <button
+                          onClick={() => {
+                            setNewStage(stage);
+                            setIsNewModalOpen(true);
+                          }}
+                          className="mt-1 text-[11px] font-semibold text-indigo-600 hover:underline"
+                        >
+                          + Add First Item
+                        </button>
                       </div>
                     )}
                   </div>

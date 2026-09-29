@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { checkRateLimit, getClientIdentifier } from "@/lib/rate-limiter";
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const sessionCookie = req.cookies.get("nexus_session")?.value;
 

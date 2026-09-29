@@ -102,7 +102,7 @@ export default function DigitalAssetManagementPage() {
           type: "image",
           size: "2.4 MB",
           dimensions: aspectRatio === "16:9" ? "1920 x 1080" : aspectRatio === "1:1" ? "1080 x 1080" : "1080 x 1920",
-          previewUrl: "/nexus-hero-3d.jpg",
+          previewUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(aiPrompt)}?width=1280&height=720&nologo=true&seed=${Date.now()}`,
           prompt: aiPrompt,
           tags: ["AI Generated", "FLUX Engine", aspectRatio]
         })
